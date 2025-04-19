@@ -1,54 +1,105 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'recipe_detail_screen.dart';
+import 'recipe_data.dart';
+import 'dart:async';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+  Timer? _autoScrollTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startAutoScroll();
+  }
+
+  void _startAutoScroll() {
+    _autoScrollTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (_pageController.hasClients) {
+        int nextPage = (_currentPage + 1) % recipeList.length;
+        _pageController.animateToPage(
+          nextPage,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+        setState(() {
+          _currentPage = nextPage;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _autoScrollTimer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
 
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: ListView(
+    return Scaffold(
+      backgroundColor: Colors.grey[200],
+      appBar: AppBar(
+        backgroundColor: Colors.pinkAccent,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const SizedBox(height: 12),
             Row(
               children: [
                 const CircleAvatar(
-                  radius: 20,
-                  backgroundImage: AssetImage(
-                    'assets/images/profile.jpg',
-                  ), // ảnh avatar demo
+                  radius: 21,
+                  backgroundImage: AssetImage('assets/images/profile.jpg'),
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    "Hello, ${user?.email?.split('@')[0] ?? "Chef"}!",
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
+                const SizedBox(width: 15),
+                Text(
+                  "Hello, ${user?.email?.split('@')[0] ?? "Chef"}!",
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.logout),
-                  onPressed: () async {
-                    await FirebaseAuth.instance.signOut();
-                    Navigator.pushReplacementNamed(context, '/login');
-                  },
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            const Text(
-              "What are we cooking today?",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            IconButton(
+              icon: const Icon(Icons.logout, color: Colors.white),
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushReplacementNamed(context, '/login');
+              },
             ),
-            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 26),
+
+            const Text(
+              "What are we cooking \ntoday?",
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 17),
             TextField(
               decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.white,
                 prefixIcon: const Icon(Icons.search),
                 hintText: 'Ex: Veggie Burger',
                 suffixIcon: const Icon(Icons.tune),
@@ -57,52 +108,160 @@ class HomePage extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 26),
             const Text(
-              "Recipe of the day",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              "Recipes",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 12),
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              elevation: 2,
+            SizedBox(
+              height: 324,
               child: Column(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.asset('assets/images/risotto.jpg'), // ảnh demo
+                  Expanded(
+                    child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: recipeList.length,
+                      onPageChanged: (index) {
+                        setState(() => _currentPage = index);
+                      },
+                      itemBuilder: (context, index) {
+                        final recipe = recipeList[index];
+                        return Container(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 12,
+                          ),
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 4,
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Image.asset(
+                                      recipe['image'],
+                                      height: 180,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  recipe['title'],
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 8),
+                                                Text(
+                                                  recipe['tags'],
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    Colors.pinkAccent,
+                                                foregroundColor: Colors.white,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                ),
+                                              ),
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder:
+                                                        (
+                                                          _,
+                                                        ) => RecipeDetailScreen(
+                                                          title:
+                                                              recipe['title'],
+                                                          imageUrl:
+                                                              recipe['image'],
+                                                          ingredients: List<
+                                                            String
+                                                          >.from(
+                                                            recipe['ingredients'],
+                                                          ),
+                                                          instructions: List<
+                                                            String
+                                                          >.from(
+                                                            recipe['instructions'],
+                                                          ),
+                                                        ),
+                                                  ),
+                                                );
+                                              },
+                                              child: const Text("Cook now"),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Creamy Fungi Risotto 🍄",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List<Widget>.generate(
+                      recipeList.length,
+                      (index) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        child: InkWell(
+                          onTap: () {
+                            _pageController.animateToPage(
+                              index,
+                              duration: Duration(milliseconds: 300),
+                              curve: Curves.ease,
+                            );
+                          },
+                          child: CircleAvatar(
+                            radius: 4,
+                            backgroundColor:
+                                _currentPage == index
+                                    ? Colors.pinkAccent
+                                    : Colors.grey,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        const Text("Healthy • Vegetarian • Lunch"),
-                        const SizedBox(height: 8),
-                        ElevatedButton(
-                          onPressed: () {},
-                          child: const Text("Cook now"),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
+
             const SizedBox(height: 24),
             const Text(
               "Categories",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             Row(
@@ -170,7 +329,7 @@ class CategoryIcon extends StatelessWidget {
       children: [
         CircleAvatar(
           backgroundColor: Colors.grey.shade200,
-          child: Icon(icon, color: Colors.green),
+          child: Icon(icon, color: Colors.pinkAccent),
         ),
         const SizedBox(height: 4),
         Text(label, style: const TextStyle(fontSize: 12)),
