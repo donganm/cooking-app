@@ -69,27 +69,41 @@ class RecipeDetailScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
 
             Card(
               color: Colors.pinkAccent,
               child: Column(
-                children:[
-                  Text('Instructions', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+                children: [
+                  Text(
+                    'Instructions',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
                   ...List.generate(instructions.length, (index) {
-                    return  Padding(
+                    return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(' ${index + 1}. ', style: TextStyle(fontSize: 18, color: Colors.lightGreenAccent, fontWeight: FontWeight.bold)),
-                          Text(' ${instructions[index]}', style: TextStyle(fontSize: 18, color: Colors.white)),
-                        ]
+                          Text(
+                            ' ${index + 1}. ',
+                            style: TextStyle(fontSize: 18, color: Colors.lightGreenAccent, fontWeight: FontWeight.bold),
+                          ),
+                          Expanded(
+                            child: Text(
+                              ' ${instructions[index]}',
+                              style: TextStyle(fontSize: 18, color: Colors.white),
+
+                            ),
+                          ),
+                        ],
                       ),
                     );
                   }),
                 ],
               ),
-            ),
+            )
+
 
           ],
         ),

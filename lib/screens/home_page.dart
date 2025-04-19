@@ -115,7 +115,7 @@ class _HomePageState extends State<HomePage> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(
-              height: 324,
+              height: 335,
               child: Column(
                 children: [
                   Expanded(
@@ -128,18 +128,18 @@ class _HomePageState extends State<HomePage> {
                       itemBuilder: (context, index) {
                         final recipe = recipeList[index];
                         return Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                          margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 12),
                           child: Card(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
                             elevation: 4,
                             child: Padding(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(10),
                               child: Column(
                                 children: [
                                   ClipRRect(
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(15),
                                     child: Image.asset(
                                       recipe['image'],
                                       height: 180,
@@ -151,45 +151,57 @@ class _HomePageState extends State<HomePage> {
                                     padding: const EdgeInsets.all(12),
                                     child: Column(
                                       children: [
+                                        SizedBox(height: 10),
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  recipe['title'],
-                                                  style: const TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 8),
-                                                Text(recipe['tags'], style: const TextStyle(fontSize: 15)),
-                                              ],
-                                            ),
-                                            ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.pinkAccent,
-                                                foregroundColor: Colors.white,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(12),
-                                                ),
-                                              ),
-                                              onPressed: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (_) => RecipeDetailScreen(
-                                                      title: recipe['title'],
-                                                      imageUrl: recipe['image'],
-                                                      ingredients: List<String>.from(recipe['ingredients']),
-                                                      instructions: List<String>.from(recipe['instructions']),
+                                            Expanded(
+                                              flex: 3,
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    recipe['title'],
+                                                    style: const TextStyle(
+                                                      fontSize: 17,
+                                                      fontWeight: FontWeight.bold,
                                                     ),
                                                   ),
-                                                );
-                                              },
-                                              child: const Text("Cook now"),
+                                                  const SizedBox(height: 8),
+                                                  Text(recipe['tags'], style: const TextStyle(fontSize: 13)),
+                                                ],
+                                              ),
+                                            ),
+
+                                            const SizedBox(width: 15),
+
+                                            Expanded(
+                                              flex: 2,
+                                              child: SizedBox(
+                                                height: 50,
+                                                child: ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: Colors.pinkAccent,
+                                                    foregroundColor: Colors.white,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(12),
+                                                    ),
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (_) => RecipeDetailScreen(
+                                                          title: recipe['title'],
+                                                          imageUrl: recipe['image'],
+                                                          ingredients: List<String>.from(recipe['ingredients']),
+                                                          instructions: List<String>.from(recipe['instructions']),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: const Text("Cook\nnow", textAlign: TextAlign.center, style: TextStyle(fontSize: 15)),
+                                                ),
+                                              ),
                                             ),
                                           ],
                                         ),

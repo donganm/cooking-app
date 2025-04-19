@@ -1,6 +1,6 @@
 final List<Map<String, dynamic>> recipeList = [
   {
-    'title': 'Creamy Fungi Risotto 🍄',
+    'title': 'Fungi Risotto',
     'image': 'assets/images/risotto.jpg',
     'tags': 'Healthy • Vegetarian • Lunch',
     'ingredients': [
@@ -19,7 +19,7 @@ final List<Map<String, dynamic>> recipeList = [
     ],
   },
   {
-    'title': 'New York Cheesecake',
+    'title': 'Cheesecake',
     'image': 'assets/images/cheesecake.jpg',
     'tags': 'Dessert • Sweet • Chilled',
     'ingredients': [
