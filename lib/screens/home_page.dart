@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
-            const RecipeSlider(),
+            RecipeSlider(),
 
             const SizedBox(height: 24),
             const Text(

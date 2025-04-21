@@ -15,16 +15,24 @@ class _RecipeSliderState extends State<RecipeSlider> {
   int _currentPage = 0;
   Timer? _autoScrollTimer;
 
+  final int maxSlides = 7;
+  late List<Map<String, dynamic>> randomRecipes;
+
   @override
   void initState() {
     super.initState();
+    // Shuffle and limit recipes
+    randomRecipes = List<Map<String, dynamic>>.from(recipeList)..shuffle();
+    if (randomRecipes.length > maxSlides) {
+      randomRecipes = randomRecipes.sublist(0, maxSlides);
+    }
     _startAutoScroll();
   }
 
   void _startAutoScroll() {
     _autoScrollTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
       if (_pageController.hasClients) {
-        int nextPage = (_currentPage + 1) % recipeList.length;
+        int nextPage = (_currentPage + 1) % randomRecipes.length;
         _pageController.animateToPage(
           nextPage,
           duration: const Duration(milliseconds: 500),
@@ -48,17 +56,18 @@ class _RecipeSliderState extends State<RecipeSlider> {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 345,
+      width: double.infinity,
       child: Column(
         children: [
           Expanded(
             child: PageView.builder(
               controller: _pageController,
-              itemCount: recipeList.length,
+              itemCount: randomRecipes.length,
               onPageChanged: (index) {
                 setState(() => _currentPage = index);
               },
               itemBuilder: (context, index) {
-                final recipe = recipeList[index];
+                final recipe = randomRecipes[index];
                 return Container(
                   margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 12),
                   child: Card(
@@ -130,7 +139,11 @@ class _RecipeSliderState extends State<RecipeSlider> {
                                               ),
                                             );
                                           },
-                                          child: const Text("Cook\nnow", textAlign: TextAlign.center, style: TextStyle(fontSize: 15)),
+                                          child: const Text(
+                                            "Cook\nnow",
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(fontSize: 15),
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -152,7 +165,7 @@ class _RecipeSliderState extends State<RecipeSlider> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List<Widget>.generate(
-              recipeList.length,
+              randomRecipes.length,
                   (index) => Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: InkWell(

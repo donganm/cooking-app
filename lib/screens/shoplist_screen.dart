@@ -29,23 +29,35 @@ class ShoplistScreen extends StatelessWidget {
             margin: const EdgeInsets.symmetric(vertical: 10),
 
             child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: 15,
+              ),
               leading: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.asset(item['image']!, width: 60, height: 60, fit: BoxFit.cover),
+                child: Image.asset(
+                  item['image']!,
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
               ),
-              title: Text(item['title']!, style: const TextStyle(fontWeight: FontWeight.w500)),
+              title: Text(
+                item['title']!,
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => RecipeDetailScreen(
-                      title: item['title'],
-                      imageUrl: item['image'],
-                      ingredients: item['ingredients'],
-                      instructions: item['instructions'],
-                    ),
+                    builder:
+                        (context) => RecipeDetailScreen(
+                          title: item['title'],
+                          imageUrl: item['image'],
+                          ingredients: item['ingredients'],
+                          instructions: item['instructions'],
+                        ),
                   ),
                 );
               },

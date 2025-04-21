@@ -14,10 +14,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _confirmPasswordController = TextEditingController();
 
   Future<void> _signUp() async {
-    if (_passwordController.text.trim() != _confirmPasswordController.text.trim()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Mật khẩu không khớp!")),
-      );
+    if (_passwordController.text.trim() !=
+        _confirmPasswordController.text.trim()) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Mật khẩu không khớp!")));
       return;
     }
 
@@ -27,16 +28,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
         password: _passwordController.text.trim(),
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Đăng ký thành công!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Đăng ký thành công!")));
 
       // Navigate to home or login
       Navigator.pushReplacementNamed(context, '/login');
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Lỗi: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Lỗi: $e")));
     }
   }
 
@@ -49,10 +50,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              Image.asset(
-                "assets/cooking.png",
-                height: 300,
-              ),
+              Image.asset("assets/cooking.png", height: 300),
               const SizedBox(height: 10),
               const Text(
                 "CookUp!",
@@ -126,7 +124,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               const SizedBox(height: 30),
 
-
               SizedBox(
                 width: double.infinity,
                 height: 55,
@@ -139,10 +136,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ),
                   onPressed: _signUp,
-                  child: const Text(
-                    "Sign up",
-                    style: TextStyle(fontSize: 18),
-                  ),
+                  child: const Text("Sign up", style: TextStyle(fontSize: 18)),
                 ),
               ),
 
