@@ -1,0 +1,18 @@
+[33m30ef211[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{0}: reset: moving to origin/main
+[33m12d9356[m HEAD@{1}: reset: moving to HEAD
+[33m12d9356[m HEAD@{2}: checkout: moving from main to main
+[33m12d9356[m HEAD@{3}: checkout: moving from main to main
+[33m12d9356[m HEAD@{4}: commit (merge): update
+[33mfccf8ad[m HEAD@{5}: checkout: moving from main to main
+[33mfccf8ad[m HEAD@{6}: checkout: moving from main to main
+[33mfccf8ad[m HEAD@{7}: commit: update
+[33m0295a6a[m[33m ([m[1;32mtrung[m[33m)[m HEAD@{8}: checkout: moving from trung to main
+[33m0295a6a[m[33m ([m[1;32mtrung[m[33m)[m HEAD@{9}: reset: moving to HEAD
+[33m0295a6a[m[33m ([m[1;32mtrung[m[33m)[m HEAD@{10}: checkout: moving from trung to trung
+[33m0295a6a[m[33m ([m[1;32mtrung[m[33m)[m HEAD@{11}: checkout: moving from main to trung
+[33m0295a6a[m[33m ([m[1;32mtrung[m[33m)[m HEAD@{12}: reset: moving to HEAD
+[33m0295a6a[m[33m ([m[1;32mtrung[m[33m)[m HEAD@{13}: reset: moving to HEAD
+[33m0295a6a[m[33m ([m[1;32mtrung[m[33m)[m HEAD@{14}: checkout: moving from trung to main
+[33m0295a6a[m[33m ([m[1;32mtrung[m[33m)[m HEAD@{15}: commit: update
+[33mc3b1aed[m[33m ([m[1;31morigin/master[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{16}: checkout: moving from master to trung
+[33mc3b1aed[m[33m ([m[1;31morigin/master[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{17}: commit (initial): add

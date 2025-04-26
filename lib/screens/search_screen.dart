@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'recipe_data.dart';
 import 'recipe_detail_screen.dart';
+import 'package:btl_flutter_nhom6/widgets/recipe_card.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -59,48 +60,7 @@ class _SearchScreenState extends State<SearchScreen>{
                 itemCount: filteredList.length,
                 itemBuilder: (context, index) {
                   final item = filteredList[index];
-                  return Card(
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 15,
-                      ),
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
-                          item['image']!,
-                          width: 60,
-                          height: 60,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      title: Text(
-                        item['title']!,
-                        style: const TextStyle(fontWeight: FontWeight.w500),
-                      ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (context) => RecipeDetailScreen(
-                              title: item['title'],
-                              imageUrl: item['image'],
-                              ingredients: item['ingredients'],
-                              instructions: item['instructions'],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  );
+                  return RecipeCard(item: item);
                 },
               ),
             ),

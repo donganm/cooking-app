@@ -3,6 +3,7 @@ final List<Map<String, dynamic>> recipeList = [
     'title': 'Fungi Risotto',
     'image': 'assets/images/risotto.jpg',
     'tags': 'Healthy • Vegetarian • Lunch',
+    'category': 'Entrées',
     'ingredients': [
       'Mushrooms',
       'Risotto Rice',
@@ -22,6 +23,7 @@ final List<Map<String, dynamic>> recipeList = [
     'title': 'Cheesecake',
     'image': 'assets/images/cheesecake.jpg',
     'tags': 'Dessert • Sweet • Chilled',
+    'category': 'Desserts',
     'ingredients': [
       'Crust Ingredients:\n • Crackers or biscuits (crumbled): 200g\n • Unsalted butter (melted): 80g\n • Sugar: 2 tablespoons (optional)',
       'Cheesecake Filling:\n • Cream cheese: 600g (room temperature)\n • Sugar: 150g (about 3/4 cup)\n • Sour cream: 200g (about 3/4 cup)\n • Eggs: 3\n • Vanilla extract: 1 teaspoon\n • Lemon juice or zest: 1 teaspoon (optional)',
@@ -36,6 +38,7 @@ final List<Map<String, dynamic>> recipeList = [
     'title': 'Raspberry Cake',
     'image': 'assets/images/raspberry_cake.jpg',
     'tags': 'Healthy • Vegetarian • Lunch',
+    'category': 'Desserts',
     'ingredients': [
       'Cream cheese',
       'Sugar',
@@ -52,6 +55,7 @@ final List<Map<String, dynamic>> recipeList = [
     'title': 'Tiramisu',
     'image': 'assets/images/tiramisu.jpg',
     'tags': 'Healthy • Vegetarian • Lunch',
+    'category': 'Desserts',
     'ingredients': [
       'Cream cheese',
       'Sugar',
@@ -68,6 +72,7 @@ final List<Map<String, dynamic>> recipeList = [
     'title': 'Pecan Pie',
     'image': 'assets/images/pecan_pie.jpg',
     'tags': 'Healthy • Vegetarian • Lunch',
+    'category': 'Desserts',
     'ingredients': [
       'Mushrooms',
       'Risotto Rice',
