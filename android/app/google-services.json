@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "467013595369",
+    "project_id": "quan-com-nhom6",
+    "storage_bucket": "quan-com-nhom6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:467013595369:android:96176352b6c902cd5fc078",
+        "android_client_info": {
+          "package_name": "com.example.btl_flutter_nhom6"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAo5faO2_RhH9DQP5kv_opERnaV6adfZGw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
