@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:btl_flutter_nhom6/widgets/recipes_slider.dart';
+import 'package:btl_flutter_nhom6/screens/recipe_detail.dart'; // Đảm bảo đường dẫn đúng
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -78,7 +79,7 @@ class _HomePageState extends State<HomePage> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
-            RecipeSlider(),
+            const RecipeSlider(),
 
             const SizedBox(height: 24),
             const Text(
@@ -168,19 +169,29 @@ class RecipeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Image.asset(image, height: 100, fit: BoxFit.cover),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          title,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-          textAlign: TextAlign.center,
-        ),
-      ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RecipeDetailPage(title: title, image: image),
+          ),
+        );
+      },
+      child: Column(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset(image, height: 100, fit: BoxFit.cover),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }

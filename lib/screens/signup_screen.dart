@@ -11,7 +11,8 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   Future<void> _signUp() async {
     if (_passwordController.text.trim() !=
@@ -44,85 +45,46 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.pink.shade50,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              Image.asset("assets/cooking.png", height: 300),
-              const SizedBox(height: 10),
+              Image.asset("assets/cooking.png", height: 250),
+              const SizedBox(height: 20),
               const Text(
                 "CookUp!",
-                style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
               ),
+              const SizedBox(height: 8),
               const Text(
-                "Sign up: Create an account to continue",
-                style: TextStyle(fontSize: 16),
+                "Create an account to continue",
+                style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 25),
 
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '  Email:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
+              _buildInputField(
+                "Email",
+                _emailController,
+                false,
+                Icons.email_outlined,
               ),
-              TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  hintText: "abc@gmail.com",
-                  prefixIcon: const Icon(Icons.email_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 17),
-                ),
+              const SizedBox(height: 15),
+              _buildInputField(
+                "Password",
+                _passwordController,
+                true,
+                Icons.lock_outlined,
               ),
-              const SizedBox(height: 20),
-
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '  Password:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
+              const SizedBox(height: 15),
+              _buildInputField(
+                "Confirm Password",
+                _confirmPasswordController,
+                true,
+                Icons.lock_outline,
               ),
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: "***********",
-                  prefixIcon: const Icon(Icons.lock_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 17),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '  Confirm Password:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-              ),
-              TextField(
-                controller: _confirmPasswordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: "***********",
-                  prefixIcon: const Icon(Icons.lock_outline),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 17),
-                ),
-              ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 40),
 
               SizedBox(
                 width: double.infinity,
@@ -140,7 +102,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -157,6 +119,41 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ],
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInputField(
+    String label,
+    TextEditingController controller,
+    bool obscureText,
+    IconData icon,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.grey[100],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            spreadRadius: 2,
+            blurRadius: 5,
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: obscureText,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(fontSize: 16, color: Colors.black54),
+          prefixIcon: Icon(icon, color: Colors.pinkAccent),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 15,
+            horizontal: 10,
           ),
         ),
       ),

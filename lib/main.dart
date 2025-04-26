@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:btl_flutter_nhom6/screens/signup_screen.dart';
 import 'package:btl_flutter_nhom6/screens/login_screen.dart';
 import 'package:btl_flutter_nhom6/screens/home_screen.dart';
+import 'package:btl_flutter_nhom6/screens/cooking_step.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,11 +18,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'CookUp!',
       debugShowCheckedModeBanner: false,
-      initialRoute: '/home',
+      initialRoute: '/login',
       routes: {
         '/signup': (context) => const SignUpScreen(),
         '/login': (context) => LoginScreen(),
         '/home': (context) => const HomeScreen(),
+        '/cooking_step': (context) => const CookingStepPage(),
       },
     );
   }
