@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'recipe_data.dart';
 import 'recipe_detail_screen.dart';
 import 'package:btl_flutter_nhom6/widgets/recipe_card.dart';
-import 'package:btl_flutter_nhom6/widgets/catagory.dart';
+import 'package:btl_flutter_nhom6/widgets/category.dart';
 
 class ShoplistScreen extends StatelessWidget {
   const ShoplistScreen({super.key});
@@ -16,11 +16,11 @@ class ShoplistScreen extends StatelessWidget {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
-
-      backgroundColor: Colors.grey[200],
-      body: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Catagory(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Category(),
+        ),
       ),
     );
   }

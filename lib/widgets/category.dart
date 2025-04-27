@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:btl_flutter_nhom6/screens/recipe_data.dart';
 import 'square_card.dart';
 
-class Catagory extends StatefulWidget {
-  const Catagory({super.key});
+class Category extends StatefulWidget {
+  const Category({super.key});
 
   @override
-  State<Catagory> createState() => _CatagoryState();
+  State<Category> createState() => _CategoryState();
 }
 
-class _CatagoryState extends State<Catagory> {
+class _CategoryState extends State<Category> {
   final List<String> _categories = ['All', 'Entrées', 'Desserts', 'Drinks'];
   String _selectedCategory = 'All';
   final Map<String, IconData> categoryIcons = {
     'All': Icons.menu_book,
     'Entrées': Icons.dinner_dining,
-    'Desserts': Icons.cake,
+    'Desserts': Icons.bakery_dining,
     'Drinks': Icons.emoji_food_beverage,
   };
 
@@ -41,38 +41,39 @@ class _CatagoryState extends State<Catagory> {
             final isSelected = _selectedCategory == category;
             return GestureDetector(
               onTap: () {
-              setState(() {
-              _selectedCategory = category;
-              });
+                setState(() {
+                  _selectedCategory = category;
+                });
               },
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 margin: EdgeInsets.symmetric(horizontal: 8),
-                decoration: BoxDecoration(
+                width: 110,
+                child: Card(
+                  elevation: 6,
                   color: isSelected ? Colors.pinkAccent : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.black)
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      categoryIcons[category],
-                      color: isSelected ? Colors.white : Colors.black,
-                      ),
-                    const SizedBox(width: 8),
-                    Text(
-                      category,
-                      style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.black,fontWeight: FontWeight.bold,
-                      ),
+                  child: Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          categoryIcons[category],
+                          color: isSelected ? Colors.white : Colors.black,
+                          ),
+                        const SizedBox(width: 8),
+                        Text(
+                          category,
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : Colors.black,fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             );},
           ),
         ),
-        const SizedBox(height: 10),
 
         GridView.builder(
           physics: const NeverScrollableScrollPhysics(),

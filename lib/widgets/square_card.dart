@@ -8,6 +8,12 @@ class SquareRecipeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, IconData> categoryIcons = {
+      'All': Icons.menu_book,
+      'Entrées': Icons.dinner_dining,
+      'Desserts': Icons.bakery_dining,
+      'Drinks': Icons.emoji_food_beverage,
+    };
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -16,8 +22,13 @@ class SquareRecipeCard extends StatelessWidget {
             builder: (context) => RecipeDetailScreen(
               title: item['title'],
               imageUrl: item['image'],
+              ytVideo: item['ytVideo'],
+              time: item['time'],
+              difficulty: item['difficulty'],
+              category: item['category'],
               ingredients: item['ingredients'],
               instructions: item['instructions'],
+              detail: item['detail'],
             ),
           ),
         );
@@ -25,7 +36,7 @@ class SquareRecipeCard extends StatelessWidget {
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         clipBehavior: Clip.antiAlias,
-        elevation: 4,
+        elevation: 8,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -43,11 +54,34 @@ class SquareRecipeCard extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  item['title'],
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Text(
+                        item['title'],
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        children: [
+                          Icon(
+                            categoryIcons[item['category']],
+                            size: 24,
+                          ),
+                          Text(item['category'], style: TextStyle(fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

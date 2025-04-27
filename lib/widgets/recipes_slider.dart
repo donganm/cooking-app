@@ -55,7 +55,7 @@ class _RecipeSliderState extends State<RecipeSlider> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 360,
+      height: 368,
       width: double.infinity,
       child: Column(
         children: [
@@ -70,11 +70,12 @@ class _RecipeSliderState extends State<RecipeSlider> {
                 final recipe = randomRecipes[index];
                 return Container(
                   margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 12),
+                  decoration: BoxDecoration(),
                   child: Card(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    elevation: 4,
+                    elevation: 8,
                     child: Column(
                       children: [
                         Padding(
@@ -107,12 +108,14 @@ class _RecipeSliderState extends State<RecipeSlider> {
                                               Text(
                                                 recipe['title'],
                                                 style: const TextStyle(
-                                                  fontSize: 17,
-                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 26,
+                                                  fontFamily: 'Tinos',
                                                 ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis
                                               ),
                                               const SizedBox(height: 8),
-                                              Text(recipe['tags'], style: const TextStyle(fontSize: 13)),
+                                              Text(recipe['tags'], style: const TextStyle(fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
                                             ],
                                           ),
                                         ),
@@ -135,8 +138,13 @@ class _RecipeSliderState extends State<RecipeSlider> {
                                                     builder: (_) => RecipeDetailScreen(
                                                       title: recipe['title'],
                                                       imageUrl: recipe['image'],
+                                                      time: recipe['time'],
+                                                      difficulty: recipe['difficulty'],
+                                                      ytVideo: recipe['ytVideo'],
+                                                      category: recipe['category'],
                                                       ingredients: List<String>.from(recipe['ingredients']),
                                                       instructions: List<String>.from(recipe['instructions']),
+                                                      detail: List<String>.from(recipe['detail']),
                                                     ),
                                                   ),
                                                 );

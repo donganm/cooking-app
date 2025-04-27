@@ -24,10 +24,8 @@ class _SearchScreenState extends State<SearchScreen>{
         title: const Text("Search Recipes"),
         backgroundColor: Colors.pinkAccent,
         foregroundColor: Colors.white,
-        elevation: 0,
       ),
 
-      backgroundColor: Colors.grey[200],
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

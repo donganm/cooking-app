@@ -9,7 +9,7 @@ class RecipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 3,
+      elevation: 8,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
@@ -40,8 +40,13 @@ class RecipeCard extends StatelessWidget {
               builder: (context) => RecipeDetailScreen(
                 title: item['title'],
                 imageUrl: item['image'],
+                time: item['time'],
+                difficulty: item['difficulty'],
+                ytVideo: item['ytVideo'],
+                category: item['category'],
                 ingredients: List<String>.from(item['ingredients']),
                 instructions: List<String>.from(item['instructions']),
+                detail: List<String>.from(item['detail']),
               ),
             ),
           );
