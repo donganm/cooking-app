@@ -16,7 +16,6 @@ class _HomePageState extends State<HomePage> {
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      backgroundColor: Colors.grey[200],
       appBar: AppBar(
         backgroundColor: Colors.pinkAccent,
         title: Row(
@@ -58,7 +57,11 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 26),
             const Text(
               "What are we cooking \ntoday?",
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'PlaywriteAUSA',
+              ),
             ),
             const SizedBox(height: 17),
             TextField(
@@ -73,18 +76,17 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            const SizedBox(height: 26),
-            const Text(
-              "Recipes",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
 
             const RecipeSlider(),
 
             const SizedBox(height: 24),
             const Text(
               "Categories",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'PlaywriteAUSA',
+              ),
             ),
             const SizedBox(height: 12),
             Row(

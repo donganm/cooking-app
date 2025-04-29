@@ -55,7 +55,7 @@ class _RecipeSliderState extends State<RecipeSlider> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 345,
+      height: 368,
       width: double.infinity,
       child: Column(
         children: [
@@ -69,119 +69,169 @@ class _RecipeSliderState extends State<RecipeSlider> {
               itemBuilder: (context, index) {
                 final recipe = randomRecipes[index];
                 return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 12),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 5,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(),
                   child: Card(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    elevation: 4,
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(15),
-                            child: Image.asset(
-                              recipe['image'],
-                              height: 195,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Column(
-                              children: [
-                                const SizedBox(height: 10),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    elevation: 8,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: Image.asset(
+                                  recipe['image'],
+                                  height: 200,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Column(
                                   children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            recipe['title'],
-                                            style: const TextStyle(
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Text(recipe['tags'], style: const TextStyle(fontSize: 13)),
-                                        ],
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: SizedBox(
-                                        height: 50,
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.pinkAccent,
-                                            foregroundColor: Colors.white,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(12),
-                                            ),
-                                          ),
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => RecipeDetailScreen(
-                                                  title: recipe['title'],
-                                                  imageUrl: recipe['image'],
-                                                  ingredients: List<String>.from(recipe['ingredients']),
-                                                  instructions: List<String>.from(recipe['instructions']),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          flex: 3,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                recipe['title'],
+                                                style: const TextStyle(
+                                                  fontSize: 26,
+                                                  fontFamily: 'Tinos',
                                                 ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
-                                            );
-                                          },
-                                          child: const Text(
-                                            "Cook\nnow",
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(fontSize: 15),
+                                              const SizedBox(height: 8),
+                                              Text(
+                                                recipe['tags'],
+                                                style: const TextStyle(
+                                                  fontSize: 13,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                      ),
+                                        Expanded(
+                                          flex: 2,
+                                          child: SizedBox(
+                                            height: 50,
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    Colors.pinkAccent,
+                                                foregroundColor: Colors.white,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                ),
+                                              ),
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder:
+                                                        (
+                                                          _,
+                                                        ) => RecipeDetailScreen(
+                                                          title:
+                                                              recipe['title'],
+                                                          imageUrl:
+                                                              recipe['image'],
+                                                          time: recipe['time'],
+                                                          difficulty:
+                                                              recipe['difficulty'],
+                                                          ytVideo:
+                                                              recipe['ytVideo'],
+                                                          category:
+                                                              recipe['category'],
+                                                          ingredients: List<
+                                                            String
+                                                          >.from(
+                                                            recipe['ingredients'],
+                                                          ),
+                                                          instructions: List<
+                                                            String
+                                                          >.from(
+                                                            recipe['instructions'],
+                                                          ),
+                                                          detail: List<
+                                                            String
+                                                          >.from(
+                                                            recipe['detail'],
+                                                          ),
+                                                        ),
+                                                  ),
+                                                );
+                                              },
+                                              child: const Text(
+                                                "Cook\nnow",
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(fontSize: 15),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
-                              ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Dots Indicator
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List<Widget>.generate(
+                            randomRecipes.length,
+                            (index) => Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 5,
+                              ),
+                              child: InkWell(
+                                onTap: () {
+                                  _pageController.animateToPage(
+                                    index,
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.ease,
+                                  );
+                                },
+                                child: CircleAvatar(
+                                  radius: 4,
+                                  backgroundColor:
+                                      _currentPage == index
+                                          ? Colors.pinkAccent
+                                          : Colors.grey,
+                                ),
+                              ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 );
               },
-            ),
-          ),
-
-          // Dots Indicator
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List<Widget>.generate(
-              randomRecipes.length,
-                  (index) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                child: InkWell(
-                  onTap: () {
-                    _pageController.animateToPage(
-                      index,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.ease,
-                    );
-                  },
-                  child: CircleAvatar(
-                    radius: 4,
-                    backgroundColor: _currentPage == index ? Colors.pinkAccent : Colors.grey,
-                  ),
-                ),
-              ),
             ),
           ),
         ],
