@@ -27,7 +27,7 @@ class ProfileScreen extends StatelessWidget {
                 const CircleAvatar(radius: 50, backgroundColor: Colors.red),
                 const SizedBox(height: 10),
                 const Text(
-                  "Tên người dùng", //có db tương ứng tên người dùng đăng ký
+                  "Tên người dùng",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ],

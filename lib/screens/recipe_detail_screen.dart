@@ -8,9 +8,9 @@ class RecipeDetailScreen extends StatelessWidget {
   final String difficulty;
   final String ytVideo;
   final String category;
-  final List<String> ingredients;
-  final List<String> instructions;
-  final List<String> detail;
+  final List<dynamic> ingredients;
+  final List<dynamic> instructions;
+  final List<dynamic> detail;
 
   const RecipeDetailScreen({
     super.key,
@@ -27,146 +27,144 @@ class RecipeDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final int stepCount = instructions.length.clamp(0, detail.length);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.pinkAccent,
         foregroundColor: Colors.white,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: Text(title, style: TextStyle(fontSize: 28)),
+        title: Text(title, style: const TextStyle(fontSize: 24)),
         centerTitle: true,
-        actions: [Icon(Icons.favorite_border), SizedBox(width: 16)],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+        actions: const [Icon(Icons.favorite_border), SizedBox(width: 16)],
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Image Banner
+            ClipRRect(
+              borderRadius: BorderRadius.circular(0),
+              child:
+                  imageUrl.startsWith('http')
+                      ? Image.network(
+                        imageUrl,
+                        width: double.infinity,
+                        height: 220,
+                        fit: BoxFit.cover,
+                        errorBuilder:
+                            (context, error, stackTrace) =>
+                                const Icon(Icons.broken_image, size: 80),
+                      )
+                      : Image.asset(
+                        imageUrl,
+                        width: double.infinity,
+                        height: 220,
+                        fit: BoxFit.cover,
+                      ),
+            ),
+
+            // Info section
             Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(height: 20),
-                  Row(
-                    children: [
-                      SizedBox(height: 10),
-                      Expanded(
-                        flex: 1,
-                        child: Column(
-                          children: [
-                            Icon(Icons.restaurant, size: 30),
-                            Text(category, style: TextStyle(fontSize: 15)),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Column(
-                          children: [
-                            Icon(Icons.timer, size: 30),
-                            Text(time, style: TextStyle(fontSize: 15)),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Column(
-                          children: [
-                            Icon(Icons.local_fire_department, size: 30),
-                            Text(difficulty, style: TextStyle(fontSize: 15)),
-                          ],
-                        ),
-                      ),
-                    ],
+                  InfoIcon(label: category, icon: Icons.restaurant),
+                  InfoIcon(label: time, icon: Icons.timer),
+                  InfoIcon(
+                    label: difficulty,
+                    icon: Icons.local_fire_department,
                   ),
-                  const SizedBox(height: 20),
-                  YoutubeVideoPlayer(videoUrl: ytVideo),
                 ],
               ),
             ),
 
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Text(
-                    'Ingredients',
-                    style: TextStyle(
-                      fontSize: 25,
-                      color: Colors.pinkAccent,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'PlaywriteAUSA',
-                    ),
-                  ),
-                ],
+            // YouTube video section
+            if (ytVideo.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: YoutubeVideoPlayer(videoUrl: ytVideo),
               ),
-            ),
-            Column(
-              children: [
-                ...List.generate(ingredients.length, (index) {
-                  final backgroundColor =
-                      index.isEven ? Colors.grey[200] : Colors.white;
-                  return Container(
-                    color: backgroundColor,
-                    width: double.infinity,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              ' ${ingredients[index]}',
-                              style: TextStyle(fontSize: 18),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }),
-              ],
-            ),
-            const SizedBox(height: 20),
 
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Instructions',
-                    style: TextStyle(
-                      fontSize: 25,
-                      color: Colors.pinkAccent,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'PlaywriteAUSA',
-                    ),
+            const SizedBox(height: 24),
+
+            // Ingredients
+            SectionTitle(title: 'Nguyên liệu'),
+            ...ingredients.map((item) {
+              return ListTile(
+                leading: const Icon(Icons.circle, size: 10),
+                title: Text(item, style: const TextStyle(fontSize: 16)),
+              );
+            }).toList(),
+
+            const SizedBox(height: 24),
+
+            // Instructions
+            SectionTitle(title: 'Cách làm'),
+            ...List.generate(stepCount, (index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  ...List.generate(instructions.length, (index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      child: Card(
-                        elevation: 8,
-                        child: InstructionTile(
-                          title: '${index + 1}. ${instructions[index]}',
-                          detail: detail[index],
-                        ),
-                      ),
-                    );
-                  }),
-                ],
-              ),
-            ),
+                  child: InstructionTile(
+                    title: '${index + 1}. ${instructions[index]}',
+                    detail: detail[index],
+                  ),
+                ),
+              );
+            }),
+            const SizedBox(height: 32),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class InfoIcon extends StatelessWidget {
+  final String label;
+  final IconData icon;
+
+  const InfoIcon({super.key, required this.label, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Icon(icon, size: 28, color: Colors.pink),
+        const SizedBox(height: 4),
+        Text(label, style: const TextStyle(fontSize: 14)),
+      ],
+    );
+  }
+}
+
+class SectionTitle extends StatelessWidget {
+  final String title;
+
+  const SectionTitle({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.pinkAccent,
         ),
       ),
     );
@@ -189,35 +187,27 @@ class _InstructionTileState extends State<InstructionTile> {
   @override
   Widget build(BuildContext context) {
     return ExpansionTile(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      collapsedShape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+      title: Text(
+        widget.title,
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w500,
+          color: isExpanded ? Colors.pink : Colors.black,
+        ),
       ),
-      backgroundColor: isExpanded ? Colors.pinkAccent : Colors.white,
-      collapsedBackgroundColor: Colors.white,
+      trailing: Icon(
+        isExpanded ? Icons.expand_less : Icons.expand_more,
+        color: isExpanded ? Colors.pink : Colors.black,
+      ),
       onExpansionChanged: (expanded) {
         setState(() {
           isExpanded = expanded;
         });
       },
-      title: Text(
-        widget.title,
-        style: TextStyle(
-          fontSize: 20,
-          color: isExpanded ? Colors.white : Colors.black,
-        ),
-      ),
       children: [
-        Container(
-          padding: EdgeInsets.all(16),
-          alignment: Alignment.centerLeft,
-          child: Text(
-            widget.detail,
-            style: TextStyle(
-              color: isExpanded ? Colors.white : Colors.black,
-              fontSize: 18,
-            ),
-          ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Text(widget.detail, style: const TextStyle(fontSize: 16)),
         ),
       ],
     );

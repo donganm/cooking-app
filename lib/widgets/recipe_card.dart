@@ -10,9 +10,7 @@ class RecipeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 8,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       margin: const EdgeInsets.symmetric(vertical: 10),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(
@@ -37,17 +35,18 @@ class RecipeCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => RecipeDetailScreen(
-                title: item['title'],
-                imageUrl: item['image'],
-                time: item['time'],
-                difficulty: item['difficulty'],
-                ytVideo: item['ytVideo'],
-                category: item['category'],
-                ingredients: List<String>.from(item['ingredients']),
-                instructions: List<String>.from(item['instructions']),
-                detail: List<String>.from(item['detail']),
-              ),
+              builder:
+                  (context) => RecipeDetailScreen(
+                    title: item['title'],
+                    imageUrl: item['image'],
+                    time: item['time'],
+                    difficulty: item['difficulty'],
+                    ytVideo: item['ytVideo'],
+                    category: item['category'],
+                    ingredients: List<String>.from(item['ingredients']),
+                    instructions: List<String>.from(item['instructions']),
+                    detail: List<String>.from(item['detail']),
+                  ),
             ),
           );
         },

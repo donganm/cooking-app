@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:btl_flutter_nhom6/screens/recipe_data.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:btl_flutter_nhom6/screens/recipe_detail_screen.dart';
 
 class RecipeSlider extends StatefulWidget {
@@ -16,23 +16,33 @@ class _RecipeSliderState extends State<RecipeSlider> {
   Timer? _autoScrollTimer;
 
   final int maxSlides = 7;
-  late List<Map<String, dynamic>> randomRecipes;
+  List<Map<String, dynamic>> recipes = [];
 
   @override
   void initState() {
     super.initState();
-    // Shuffle and limit recipes
-    randomRecipes = List<Map<String, dynamic>>.from(recipeList)..shuffle();
-    if (randomRecipes.length > maxSlides) {
-      randomRecipes = randomRecipes.sublist(0, maxSlides);
+    _fetchRecipes();
+  }
+
+  Future<void> _fetchRecipes() async {
+    final snapshot =
+        await FirebaseFirestore.instance.collection('recipes').get();
+    List<Map<String, dynamic>> fetched =
+        snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+    fetched.shuffle();
+    if (fetched.length > maxSlides) {
+      fetched = fetched.sublist(0, maxSlides);
     }
+    setState(() {
+      recipes = fetched;
+    });
     _startAutoScroll();
   }
 
   void _startAutoScroll() {
     _autoScrollTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      if (_pageController.hasClients) {
-        int nextPage = (_currentPage + 1) % randomRecipes.length;
+      if (_pageController.hasClients && recipes.isNotEmpty) {
+        int nextPage = (_currentPage + 1) % recipes.length;
         _pageController.animateToPage(
           nextPage,
           duration: const Duration(milliseconds: 500),
@@ -54,6 +64,10 @@ class _RecipeSliderState extends State<RecipeSlider> {
 
   @override
   Widget build(BuildContext context) {
+    if (recipes.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return SizedBox(
       height: 368,
       width: double.infinity,
@@ -62,18 +76,15 @@ class _RecipeSliderState extends State<RecipeSlider> {
           Expanded(
             child: PageView.builder(
               controller: _pageController,
-              itemCount: randomRecipes.length,
-              onPageChanged: (index) {
-                setState(() => _currentPage = index);
-              },
+              itemCount: recipes.length,
+              onPageChanged: (index) => setState(() => _currentPage = index),
               itemBuilder: (context, index) {
-                final recipe = randomRecipes[index];
+                final recipe = recipes[index];
                 return Container(
                   margin: const EdgeInsets.symmetric(
                     horizontal: 5,
                     vertical: 12,
                   ),
-                  decoration: BoxDecoration(),
                   child: Card(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -84,7 +95,6 @@ class _RecipeSliderState extends State<RecipeSlider> {
                         Padding(
                           padding: const EdgeInsets.all(10),
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(15),
@@ -111,7 +121,7 @@ class _RecipeSliderState extends State<RecipeSlider> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                recipe['title'],
+                                                recipe['title'] ?? '',
                                                 style: const TextStyle(
                                                   fontSize: 26,
                                                   fontFamily: 'Tinos',
@@ -121,7 +131,7 @@ class _RecipeSliderState extends State<RecipeSlider> {
                                               ),
                                               const SizedBox(height: 8),
                                               Text(
-                                                recipe['tags'],
+                                                recipe['tags'] ?? '',
                                                 style: const TextStyle(
                                                   fontSize: 13,
                                                 ),
@@ -167,17 +177,20 @@ class _RecipeSliderState extends State<RecipeSlider> {
                                                           ingredients: List<
                                                             String
                                                           >.from(
-                                                            recipe['ingredients'],
+                                                            recipe['ingredients'] ??
+                                                                [],
                                                           ),
                                                           instructions: List<
                                                             String
                                                           >.from(
-                                                            recipe['instructions'],
+                                                            recipe['instructions'] ??
+                                                                [],
                                                           ),
                                                           detail: List<
                                                             String
                                                           >.from(
-                                                            recipe['detail'],
+                                                            recipe['detail'] ??
+                                                                [],
                                                           ),
                                                         ),
                                                   ),
@@ -199,11 +212,11 @@ class _RecipeSliderState extends State<RecipeSlider> {
                             ],
                           ),
                         ),
-                        // Dots Indicator
+                        // Dots
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: List<Widget>.generate(
-                            randomRecipes.length,
+                          children: List.generate(
+                            recipes.length,
                             (index) => Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 5,
