@@ -1,12 +1,95 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:btl_flutter_nhom6/screens/profile_manager/EditProfile_Screen.dart';
+import 'package:btl_flutter_nhom6/screens/profile_manager/ChangedPassword_Screen.dart';
+
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
-  void _onEditProfile() {}//them cn sau khi co db
-  void _onChangedPassword() {}
-  void _onDeleteAccount() {}
-  void _onLogout() {}
+  void _onEditProfile(BuildContext context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+  );
+}
+
+void _onChangedPassword(BuildContext context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (_) => const ChangedPasswordScreen()),
+  );
+}
+void _onDeleteAccount(BuildContext context) async {
+  final user = FirebaseAuth.instance.currentUser;
+
+  final confirm = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text("Xóa tài khoản"),
+      content: Text("Bạn có chắc chắn muốn xóa tài khoản email:\n${user?.email}?"),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(false),
+          child: const Text("Hủy"),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(true),
+          child: const Text("Xóa"),
+        ),
+      ],
+    ),
+  );
+
+  if (confirm != true) return;
+
+  try {
+    await user?.delete();
+    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+  } on FirebaseAuthException catch (e) {
+    String message = "Đã xảy ra lỗi.";
+    if (e.code == 'requires-recent-login') {
+      message = "Vui lòng đăng nhập lại trước khi xóa tài khoản.";
+    }
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Lỗi"),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text("OK"),
+          )
+        ],
+      ),
+    );
+  }
+}
+void _onLogout(BuildContext context) async {
+  final confirm = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text("Xác nhận đăng xuất"),
+      content: const Text("Bạn có chắc chắn muốn đăng xuất không?"),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(false),
+          child: const Text("Hủy"),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(true),
+          child: const Text("Đăng xuất"),
+        ),
+      ],
+    ),
+  );
+
+  if (confirm == true) {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushReplacementNamed(context, '/login');
+  }
+}
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -24,11 +107,11 @@ class ProfileScreen extends StatelessWidget {
           Center(
             child: Column(
               children: [
-                const CircleAvatar(radius: 50, backgroundColor: Colors.red),
+                const CircleAvatar(radius: 50, backgroundImage: NetworkImage("https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/User_icon_2.svg/640px-User_icon_2.svg.png"),),
                 const SizedBox(height: 10),
-                const Text(
-                  "Tên người dùng",//có db tương ứng tên người dùng đăng ký
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Text(
+                  "Tên người dùng: ${user != null && user.email != null ? user.email!.split('@')[0] : "Chef"}",
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -38,12 +121,20 @@ class ProfileScreen extends StatelessWidget {
             title: "Bảo mật",
             color: Colors.green,
             children: [
-              _buildTitle(Icons.edit, "Sửa thông tin", _onEditProfile),
-              _buildTitle(Icons.lock, "Đổi mật khẩu ", _onChangedPassword),
-              _buildTitle(
-                Icons.delete_forever,"Xóa tài khoản",_onDeleteAccount,
-              ),
-              _buildTitle(Icons.logout, "Đăng xuất", _onLogout),
+              _buildTitle(Icons.edit, "Sửa thông tin", () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+                );
+              }),
+              _buildTitle(Icons.lock, "Đổi mật khẩu", () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ChangedPasswordScreen()),
+                );
+              }),
+              _buildTitle(Icons.delete_forever, "Xóa tài khoản",() => _onDeleteAccount(context)),
+              _buildTitle(Icons.logout, "Đăng xuất", () => _onLogout(context)),
             ],
           ),
           const SizedBox(height: 16),
