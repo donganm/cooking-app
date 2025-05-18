@@ -21,31 +21,39 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeColor = const Color(0xFF1E2A38); // Xanh đen nhạt
+
     return Scaffold(
-      backgroundColor: Colors.pink.shade50,
+      backgroundColor: const Color(0xFFF4F6F8), // Xám rất nhạt
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Image.asset("assets/cooking.png", height: 250),
+                Image.asset("assets/cooking.png", height: 200),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   "CookUp!",
-                  style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w600,
+                    color: themeColor,
+                    letterSpacing: 1.2,
+                  ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 const Text(
-                  "Log in to your account",
-                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                  "Welcome back! Log in to continue",
+                  style: TextStyle(fontSize: 15, color: Colors.black54),
                 ),
                 const SizedBox(height: 30),
 
                 _buildLabel("Email"),
                 _buildInputField(
                   controller: emailController,
-                  hintText: "abc@gmail.com",
+                  hintText: "you@example.com",
                   icon: Icons.email_outlined,
                 ),
                 const SizedBox(height: 20),
@@ -53,27 +61,27 @@ class LoginScreen extends StatelessWidget {
                 _buildLabel("Password"),
                 _buildInputField(
                   controller: passwordController,
-                  hintText: "********",
+                  hintText: "Enter your password",
                   icon: Icons.lock_outline,
                   obscure: true,
                 ),
-                const SizedBox(height: 35),
+                const SizedBox(height: 30),
 
                 SizedBox(
                   width: double.infinity,
-                  height: 55,
+                  height: 50,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.pinkAccent,
+                      backgroundColor: themeColor,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      elevation: 5,
+                      elevation: 4,
                     ),
                     onPressed: () => _login(context),
                     child: const Text(
                       "Login",
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                      style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),
                 ),
@@ -89,7 +97,7 @@ class LoginScreen extends StatelessWidget {
                       },
                       child: const Text(
                         'Sign up',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(fontWeight: FontWeight.w600),
                       ),
                     ),
                   ],
@@ -106,10 +114,14 @@ class LoginScreen extends StatelessWidget {
     return Align(
       alignment: Alignment.centerLeft,
       child: Padding(
-        padding: const EdgeInsets.only(left: 8, bottom: 4),
+        padding: const EdgeInsets.only(left: 4, bottom: 6),
         child: Text(
           text,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          style: const TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 15,
+            color: Colors.black87,
+          ),
         ),
       ),
     );
@@ -124,9 +136,9 @@ class LoginScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: TextField(
@@ -134,9 +146,12 @@ class LoginScreen extends StatelessWidget {
         obscureText: obscure,
         decoration: InputDecoration(
           hintText: hintText,
-          prefixIcon: Icon(icon),
+          prefixIcon: Icon(icon, color: Colors.grey[700]),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 18),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18,
+            horizontal: 12,
+          ),
         ),
       ),
     );

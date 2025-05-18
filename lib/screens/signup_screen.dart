@@ -33,7 +33,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         context,
       ).showSnackBar(const SnackBar(content: Text("Đăng ký thành công!")));
 
-      // Navigate to home or login
       Navigator.pushReplacementNamed(context, '/login');
     } catch (e) {
       ScaffoldMessenger.of(
@@ -45,24 +44,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.pink.shade50,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
-              Image.asset("assets/cooking.png", height: 250),
+              const SizedBox(height: 30),
+              Image.asset("assets/cooking.png", height: 160),
               const SizedBox(height: 20),
               const Text(
                 "CookUp!",
-                style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1E2A38),
+                ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               const Text(
-                "Create an account to continue",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                "Create your account",
+                style: TextStyle(fontSize: 16, color: Colors.black45),
               ),
-              const SizedBox(height: 25),
+              const SizedBox(height: 28),
 
               _buildInputField(
                 "Email",
@@ -70,54 +74,58 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 false,
                 Icons.email_outlined,
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 20),
               _buildInputField(
                 "Password",
                 _passwordController,
                 true,
-                Icons.lock_outlined,
+                Icons.lock_outline,
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 20),
               _buildInputField(
                 "Confirm Password",
                 _confirmPasswordController,
                 true,
                 Icons.lock_outline,
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 30),
 
               SizedBox(
                 width: double.infinity,
-                height: 55,
+                height: 50,
                 child: ElevatedButton(
+                  onPressed: _signUp,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.pinkAccent,
+                    backgroundColor: const Color(0xFF1E2A38),
                     foregroundColor: Colors.white,
+                    elevation: 1,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onPressed: _signUp,
-                  child: const Text("Sign up", style: TextStyle(fontSize: 18)),
+                  child: const Text("Sign Up", style: TextStyle(fontSize: 17)),
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 18),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Already have an account?'),
+                  const Text("Already have an account? "),
                   TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(context, "/login");
-                    },
+                    onPressed:
+                        () => Navigator.pushReplacementNamed(context, "/login"),
                     child: const Text(
-                      'Log in',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      "Log in",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        // color: Color(0xFF1E2A38),
+                      ),
                     ),
                   ),
                 ],
               ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -131,32 +139,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
     bool obscureText,
     IconData icon,
   ) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.grey[100],
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            spreadRadius: 2,
-            blurRadius: 5,
-          ),
-        ],
-      ),
-      child: TextField(
-        controller: controller,
-        obscureText: obscureText,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: const TextStyle(fontSize: 16, color: Colors.black54),
-          prefixIcon: Icon(icon, color: Colors.pinkAccent),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 15,
-            horizontal: 10,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 6),
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF1E2A38),
+            ),
           ),
         ),
-      ),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: TextField(
+            controller: controller,
+            obscureText: obscureText,
+            style: const TextStyle(color: Colors.black87),
+            decoration: InputDecoration(
+              prefixIcon: Icon(icon, color: Color(0xFF1E2A38)),
+              border: InputBorder.none,
+              hintText: "Enter your $label",
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 18,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

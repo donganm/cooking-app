@@ -25,6 +25,9 @@ plugins {
 
     // Android application plugin (apply false so it won't be applied globally here)
     id("com.android.application") version "8.7.0" apply false
+    // START: FlutterFire Configuration
+    id("com.google.gms.google-services") version("4.3.15") apply false
+    // END: FlutterFire Configuration
 
     // Kotlin plugin for Android (apply false so it won't be applied globally here)
     id("org.jetbrains.kotlin.android") version "2.1.0" apply false
