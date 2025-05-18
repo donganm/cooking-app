@@ -1,3 +1,4 @@
+import 'package:btl_flutter_nhom6/screens/history_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginScreen(),
         '/home': (context) => const HomeScreen(),
         '/cooking_step': (context) => const CookingStepPage(),
+        '/order': (context) => OrderPage(),
       },
     );
   }
