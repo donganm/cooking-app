@@ -1,3 +1,4 @@
+import 'package:btl_flutter_nhom6/screens/list_holder.dart';
 import 'package:flutter/material.dart';
 import 'package:btl_flutter_nhom6/widgets/youtube_video.dart';
 
@@ -47,39 +48,56 @@ class RecipeDetailScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image Banner
-            ClipRRect(
-              borderRadius: BorderRadius.circular(0),
-              child:
-                  imageUrl.startsWith('http')
-                      ? Image.network(
-                        imageUrl,
-                        width: double.infinity,
-                        height: 220,
-                        fit: BoxFit.cover,
-                        errorBuilder:
-                            (context, error, stackTrace) =>
-                                const Icon(Icons.broken_image, size: 80),
-                      )
-                      : Image.asset(
-                        imageUrl,
-                        width: double.infinity,
-                        height: 220,
-                        fit: BoxFit.cover,
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(0),
+                  child:
+                      imageUrl.startsWith('http')
+                          ? Image.network(
+                            imageUrl,
+                            width: double.infinity,
+                            height: 170,
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (context, error, stackTrace) =>
+                                    const Icon(Icons.broken_image, size: 80),
+                          )
+                          : Image.asset(
+                            imageUrl,
+                            width: double.infinity,
+                            height: 170,
+                            fit: BoxFit.cover,
+                          ),
+                ),
+                // Lớp làm mờ phía dưới ảnh
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          Colors.white, // hoặc nền background phía dưới
+                          Colors.white.withOpacity(0.0),
+                        ],
+                        stops: [0.0, 0.4],
                       ),
+                    ),
+                  ),
+                ),
+              ],
             ),
 
             // Info section
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 30),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  InfoIcon(label: category, icon: Icons.restaurant),
+                  InfoIcon(label: category, icon: categoryIcons[category] ?? Icons.restaurant),
                   InfoIcon(label: time, icon: Icons.timer),
-                  InfoIcon(
-                    label: difficulty,
-                    icon: Icons.local_fire_department,
-                  ),
+                  InfoIcon(label: difficulty, icon: Icons.local_fire_department,),
                 ],
               ),
             ),
@@ -95,12 +113,31 @@ class RecipeDetailScreen extends StatelessWidget {
 
             // Ingredients
             SectionTitle(title: 'Nguyên liệu'),
-            ...ingredients.map((item) {
-              return ListTile(
-                leading: const Icon(Icons.circle, size: 10),
-                title: Text(item, style: const TextStyle(fontSize: 16)),
+            ...List.generate(ingredients.length, (index) {
+              final backgroundColor =
+              index.isEven ? Colors.grey[200] : Colors.white;
+              return Container(
+                color: backgroundColor,
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          ' ${ingredients[index]}',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               );
-            }).toList(),
+            }),
 
             const SizedBox(height: 24),
 
@@ -187,27 +224,35 @@ class _InstructionTileState extends State<InstructionTile> {
   @override
   Widget build(BuildContext context) {
     return ExpansionTile(
-      title: Text(
-        widget.title,
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w500,
-          color: isExpanded ? Colors.pink : Colors.black,
-        ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      collapsedShape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
       ),
-      trailing: Icon(
-        isExpanded ? Icons.expand_less : Icons.expand_more,
-        color: isExpanded ? Colors.pink : Colors.black,
-      ),
+      backgroundColor: isExpanded ? Colors.pinkAccent : Colors.white,
+      collapsedBackgroundColor: Colors.white,
       onExpansionChanged: (expanded) {
         setState(() {
           isExpanded = expanded;
         });
       },
+      title: Text(
+        widget.title,
+        style: TextStyle(
+          fontSize: 20,
+          color: isExpanded ? Colors.white : Colors.black,
+        ),
+      ),
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Text(widget.detail, style: const TextStyle(fontSize: 16)),
+        Container(
+          padding: EdgeInsets.all(16),
+          alignment: Alignment.centerLeft,
+          child: Text(
+            widget.detail,
+            style: TextStyle(
+              color: isExpanded ? Colors.white : Colors.black,
+              fontSize: 18,
+            ),
+          ),
         ),
       ],
     );

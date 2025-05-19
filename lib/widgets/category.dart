@@ -1,5 +1,7 @@
+import 'package:btl_flutter_nhom6/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../screens/list_holder.dart';
 import 'square_card.dart';
 
 class Category extends StatefulWidget {
@@ -10,26 +12,12 @@ class Category extends StatefulWidget {
 }
 
 class _CategoryState extends State<Category> {
-  final List<String> _categories = [
-    'Tất cả',
-    'Món khai vị',
-    'Món chính',
-    'Món tráng miệng',
-    'Đồ uống', // Nếu có thể thêm mục Đồ uống
-  ];
   String _selectedCategory = 'Tất cả';
-
-  final Map<String, IconData> categoryIcons = {
-    'Tất cả': Icons.menu_book,
-    'Món khai vị': Icons.dinner_dining,
-    'Món chính': Icons.fastfood,
-    'Món tráng miệng': Icons.bakery_dining,
-    'Đồ uống': Icons.emoji_food_beverage,
-  };
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    // Truy vấn Firestore, lọc theo category nếu cần
     Query recipeQuery = FirebaseFirestore.instance.collection('recipes');
     if (_selectedCategory != 'Tất cả') {
       recipeQuery = recipeQuery.where('category', isEqualTo: _selectedCategory);
@@ -40,22 +28,23 @@ class _CategoryState extends State<Category> {
         // Thanh chọn danh mục
         SizedBox(
           height: 50,
-          width: double.infinity,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: _categories.length,
+            itemCount: categories.length,
             itemBuilder: (context, index) {
-              final category = _categories[index];
+              final category = categories[index];
               final isSelected = _selectedCategory == category;
               return GestureDetector(
                 onTap: () {
                   setState(() {
                     _selectedCategory = category;
+                    _searchQuery = '';
+                    _searchController.clear(); // Xóa ô tìm kiếm khi đổi danh mục
                   });
                 },
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8),
-                  width: 110,
+                  width: 140,
                   child: Card(
                     elevation: 6,
                     color: isSelected ? Colors.pinkAccent : Colors.white,
@@ -84,8 +73,19 @@ class _CategoryState extends State<Category> {
             },
           ),
         ),
+        const SizedBox(height: 10),
 
-        // Danh sách món ăn theo danh mục (dữ liệu từ Firestore)
+        // Thanh tìm kiếm
+        RecipeSearch(
+          controller: _searchController,
+          onSearchChanged: (query) {
+            setState(() {
+              _searchQuery = query;
+            });
+          },
+        ),
+
+        // Danh sách món ăn
         StreamBuilder<QuerySnapshot>(
           stream: recipeQuery.snapshots(),
           builder: (context, snapshot) {
@@ -99,11 +99,26 @@ class _CategoryState extends State<Category> {
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
               return const Padding(
                 padding: EdgeInsets.all(20),
-                child: Center(child: Text('No recipes found')),
+                child: Center(child: Text('Không tìm thấy công thức')),
               );
             }
 
-            final recipes = snapshot.data!.docs;
+            final recipes = snapshot.data!.docs
+                .map((doc) => doc.data() as Map<String, dynamic>)
+                .where((data) {
+              final title = (data['title'] ?? '').toString().toLowerCase();
+              final category = (data['category'] ?? '').toString().toLowerCase();
+              return title.contains(_searchQuery.toLowerCase()) ||
+                  category.contains(_searchQuery.toLowerCase());
+            })
+                .toList();
+
+            if (recipes.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.all(20),
+                child: Center(child: Text('Không tìm thấy công thức')),
+              );
+            }
 
             return GridView.builder(
               physics: const NeverScrollableScrollPhysics(),
@@ -117,7 +132,7 @@ class _CategoryState extends State<Category> {
                 childAspectRatio: 1,
               ),
               itemBuilder: (context, index) {
-                final data = recipes[index].data() as Map<String, dynamic>;
+                final data = recipes[index];
                 return SquareRecipeCard(item: data);
               },
             );
