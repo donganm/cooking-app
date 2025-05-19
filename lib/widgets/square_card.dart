@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:btl_flutter_nhom6/screens/recipe_detail_screen.dart';
 
+import '../screens/list_holder.dart';
+
 class SquareRecipeCard extends StatelessWidget {
   final Map<String, dynamic> item;
 
@@ -8,14 +10,6 @@ class SquareRecipeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Danh mục và icon tương ứng
-    final Map<String, IconData> categoryIcons = {
-      'Tất cả': Icons.menu_book,
-      'Món khai vị': Icons.dinner_dining,
-      'Món chính': Icons.fastfood,
-      'Món tráng miệng': Icons.cake,
-      'Đồ uống': Icons.local_drink,
-    };
 
     // Lấy danh mục và icon
     String category = item['category'] ?? 'Tất cả';
@@ -75,12 +69,12 @@ class SquareRecipeCard extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(left: 8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Expanded(
-                      flex: 3,
+                      flex: 5,
                       child: Text(
                         item['title'] ?? '',
                         maxLines: 2,
@@ -92,11 +86,13 @@ class SquareRecipeCard extends StatelessWidget {
                       ),
                     ),
                     Expanded(
-                      flex: 2,
+                      flex: 4,
                       child: Column(
                         children: [
+                          SizedBox(height: 4),
                           Icon(icon, size: 24),
-                          Text(category, style: const TextStyle(fontSize: 12)),
+                          SizedBox(height: 2),
+                          Text(category, style: const TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,),
                         ],
                       ),
                     ),

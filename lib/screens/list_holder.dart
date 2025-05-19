@@ -1,3 +1,22 @@
+import 'package:flutter/material.dart';
+
+final List<String> categories = [
+  'Tất cả',
+  'Khai vị',
+  'Món chính',
+  'Tráng miệng',
+  'Đồ uống',
+];
+
+final Map<String, IconData> categoryIcons = {
+  'Tất cả': Icons.menu_book,
+  'Khai vị': Icons.kebab_dining,
+  'Món chính': Icons.dinner_dining,
+  'Tráng miệng': Icons.bakery_dining,
+  'Đồ uống': Icons.local_bar,
+};
+
+
 // final List<Map<String, dynamic>> recipeList = [
 //   {
 //     'title': 'Risotto',

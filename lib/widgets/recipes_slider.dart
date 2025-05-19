@@ -15,7 +15,7 @@ class _RecipeSliderState extends State<RecipeSlider> {
   int _currentPage = 0;
   Timer? _autoScrollTimer;
 
-  final int maxSlides = 7;
+  final int maxSlides = 6;
   List<Map<String, dynamic>> recipes = [];
 
   @override
