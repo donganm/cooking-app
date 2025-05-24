@@ -73,7 +73,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   prefixIcon: const Icon(Icons.search),
                   hintText: 'Ví dụ: Burger rau củ',
                   suffixIcon: IconButton(
-                    icon: const Icon(Icons.mic),
+                    icon:  Icon(Icons.mic,color: isListening ? Colors.green : Colors.black,),
                       onPressed: () {
                         // gọi chức năng ghi âm
                         
