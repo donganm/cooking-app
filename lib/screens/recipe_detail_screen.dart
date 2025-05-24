@@ -53,7 +53,7 @@ class RecipeDetailScreen extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(0),
                   child:
-                      imageUrl.startsWith('http')
+                      imageUrl.startsWith('https')
                           ? Image.network(
                             imageUrl,
                             width: double.infinity,

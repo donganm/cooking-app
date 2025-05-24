@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import '/services/user_auth_service.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -9,29 +9,85 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
+  final AuthService _authService = AuthService();
+
   final TextEditingController _nameController = TextEditingController();
-  final user = FirebaseAuth.instance.currentUser;
-  void _saveChanges() async {
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+
+  bool _loading = true;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
     try {
-      await user?.updateDisplayName(_nameController.text.trim());
-      await user?.reload(); // cập nhật lại thông tin
+      final data = await _authService.getUserData();
+      if (data != null) {
+        _nameController.text = data['fullname'] ?? '';
+        _addressController.text = data['address'] ?? '';
+        _phoneController.text = data['phone'] ?? '';
+      }
+    } catch (_) {}
+    setState(() {
+      _loading = false;
+    });
+  }
+
+  Future<void> _saveChanges() async {
+    setState(() {
+      _saving = true;
+    });
+
+    try {
+      await _authService.updateProfile(
+        fullname: _nameController.text.trim(),
+        address: _addressController.text.trim(),
+        phone: _phoneController.text.trim(),
+      );
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Cập nhật thành công")),
+        const SnackBar(content: Text("Cập nhật thành công")),
       );
       Navigator.pop(context);
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Lỗi: $e")),
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _saving = false;
+        });
+      }
     }
   }
 
   @override
+  void dispose() {
+    _nameController.dispose();
+    _addressController.dispose();
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_loading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Sửa Thông Tin"),
-        backgroundColor: Colors.pink,
+        title: const Text("Chỉnh sửa thông tin cá nhân"),
+        backgroundColor: Colors.green,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -40,14 +96,43 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(
-                labelText: "Tên hiển thị",
+                labelText: "Họ tên",
                 border: OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _saveChanges,
-              child: const Text("Lưu thay đổi"),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _addressController,
+              decoration: const InputDecoration(
+                labelText: "Địa chỉ",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
+              decoration: const InputDecoration(
+                labelText: "Số điện thoại",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _saving ? null : _saveChanges,
+                child: _saving
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text("Lưu thay đổi"),
+              ),
             ),
           ],
         ),
