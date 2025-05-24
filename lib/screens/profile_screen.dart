@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:btl_flutter_nhom6/screens/profile_manager/EditProfile_Screen.dart';
 import 'package:btl_flutter_nhom6/screens/profile_manager/ChangedPassword_Screen.dart';
 import 'package:btl_flutter_nhom6/services/user_auth_service.dart';
 import 'package:btl_flutter_nhom6/screens/UploadRecipe.dart';
+import '../widgets/square_card.dart';
+import 'favourite_list.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -21,6 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     _loadUserData();
   }
+
   Future<void> _loadUserData() async {
     final userData = await _authService.getUserData();
     if (userData != null && userData['fullname'] != null && userData['fullname'].toString().isNotEmpty) {
@@ -29,6 +33,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
     }
   }
+
   Future<void> _onEditProfile(BuildContext context) async {
     await Navigator.push(
       context,
@@ -36,6 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
     await _loadUserData();
   }
+
   void _onChangedPassword(BuildContext context) {
     Navigator.push(
       context,
@@ -89,12 +95,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
   }
+
   void _onPost(BuildContext context) async {
     await Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const UploadRecipe()),
     );
   }
+
   void _onLogout(BuildContext context) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -116,8 +124,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (confirm == true) {
       await FirebaseAuth.instance.signOut();
       Navigator.pushReplacementNamed(context, '/login');
-      }
     }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Color mau = const Color.fromARGB(255, 255, 64, 129);
@@ -129,7 +138,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         centerTitle: true,
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(8),
         children: [
           Center(
             child: Column(
@@ -149,16 +158,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 24),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Yêu thích', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const FavoriteScreen()),
+                    );
+                  },
+                  child: const Text('Tất cả', style: TextStyle(color: Colors.blue, fontSize: 15)),
+                ),
+              ],
+            ),
+          ),
+          const FavoritedWidget(),
+          const SizedBox(height: 24),
+
           _buildCard(
             title: "Bảo mật",
             color: Colors.green,
             children: [
-              _buildTitle(Icons.edit, "Sửa thông tin", () {_onEditProfile(context);}),
+              _buildTitle(Icons.edit, "Sửa thông tin", () => _onEditProfile(context)),
               _buildTitle(Icons.lock, "Đổi mật khẩu", () => _onChangedPassword(context)),
               _buildTitle(Icons.delete_forever, "Xóa tài khoản", () => _onDeleteAccount(context)),
               _buildTitle(Icons.logout, "Đăng xuất", () => _onLogout(context)),
             ],
           ),
+
           const SizedBox(height: 16),
           _buildCard(
             title: "Bài đăng",
@@ -167,6 +199,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _buildTitle(Icons.post_add, "Đăng bài mới", () => _onPost(context)),
             ],
           ),
+
           const SizedBox(height: 16),
           _buildCard(
             title: "Sách nấu ăn yêu thích",
@@ -179,17 +212,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ],
           ),
+
           const SizedBox(height: 15),
         ],
       ),
     );
   }
 
-  Widget _buildCard({
-    required String title,
-    required Color color,
-    required List<Widget> children,
-  }) {
+  Widget _buildCard({required String title, required Color color, required List<Widget> children}) {
     return Container(
       decoration: BoxDecoration(
         color: color,
@@ -218,6 +248,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
       title: Text(title, style: const TextStyle(color: Colors.white)),
       trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
       onTap: onTap,
+    );
+  }
+}
+
+class FavoritedWidget extends StatefulWidget {
+  const FavoritedWidget({super.key});
+
+  @override
+  State<FavoritedWidget> createState() => _FavoritedWidgetState();
+}
+
+class _FavoritedWidgetState extends State<FavoritedWidget> {
+  List<Map<String, dynamic>> _randomFavorites = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadRandomFavorites();
+  }
+
+  Future<void> loadRandomFavorites() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    final favorites = List<String>.from(userDoc.data()?['favorites'] ?? []);
+
+    if (favorites.isEmpty) return;
+
+    final allRecipesSnapshot = await FirebaseFirestore.instance.collection('recipes').get();
+    final allFavorites = allRecipesSnapshot.docs
+        .where((doc) => favorites.contains(doc['title']))
+        .map((doc) => doc.data())
+        .toList();
+
+    allFavorites.shuffle();
+    setState(() {
+      _randomFavorites = allFavorites.take(3).toList();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_randomFavorites.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: List.generate(_randomFavorites.length, (index) {
+        final item = _randomFavorites[index];
+        return Expanded(
+          child: Container(
+            height: 150,
+            margin: const EdgeInsets.all(3),
+            child: SquareRecipeCard(item: item),
+          ),
+        );
+      }),
     );
   }
 }

@@ -1,8 +1,10 @@
-import 'package:btl_flutter_nhom6/screens/list_holder.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:btl_flutter_nhom6/screens/list_holder.dart';
 import 'package:btl_flutter_nhom6/widgets/youtube_video.dart';
 
-class RecipeDetailScreen extends StatelessWidget {
+class RecipeDetailScreen extends StatefulWidget {
   final String title;
   final String imageUrl;
   final String time;
@@ -27,50 +29,96 @@ class RecipeDetailScreen extends StatelessWidget {
   });
 
   @override
+  State<RecipeDetailScreen> createState() => _RecipeDetailScreenState();
+}
+
+class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
+  bool isFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    checkIfFavorite();
+  }
+
+  Future<void> checkIfFavorite() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    final favorites = List<String>.from(doc.data()?['favorites'] ?? []);
+    setState(() {
+      isFavorite = favorites.contains(widget.title);
+    });
+  }
+
+  Future<void> toggleFavorite() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+    if (isFavorite) {
+      await docRef.update({
+        'favorites': FieldValue.arrayRemove([widget.title])
+      });
+    } else {
+      await docRef.set({
+        'favorites': FieldValue.arrayUnion([widget.title])
+      }, SetOptions(merge: true));
+    }
+
+    setState(() {
+      isFavorite = !isFavorite;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final int stepCount = instructions.length.clamp(0, detail.length);
+    final int stepCount = widget.instructions.length.clamp(0, widget.detail.length);
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.pinkAccent,
         foregroundColor: Colors.white,
-        title: Text(title, style: const TextStyle(fontSize: 24)),
+        title: Text(widget.title, style: const TextStyle(fontSize: 24)),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: const [Icon(Icons.favorite_border), SizedBox(width: 16)],
+        actions: [
+          IconButton(
+            icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
+            onPressed: toggleFavorite,
+          ),
+          const SizedBox(width: 16),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image Banner
             Stack(
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(0),
-                  child:
-                      imageUrl.startsWith('https')
-                          ? Image.network(
-                            imageUrl,
-                            width: double.infinity,
-                            height: 170,
-                            fit: BoxFit.cover,
-                            errorBuilder:
-                                (context, error, stackTrace) =>
-                                    const Icon(Icons.broken_image, size: 80),
-                          )
-                          : Image.asset(
-                            imageUrl,
-                            width: double.infinity,
-                            height: 170,
-                            fit: BoxFit.cover,
-                          ),
+                  child: widget.imageUrl.startsWith('http')
+                      ? Image.network(
+                    widget.imageUrl,
+                    width: double.infinity,
+                    height: 170,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.broken_image, size: 80),
+                  )
+                      : Image.asset(
+                    widget.imageUrl,
+                    width: double.infinity,
+                    height: 170,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-                // Lớp làm mờ phía dưới ảnh
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
@@ -78,7 +126,7 @@ class RecipeDetailScreen extends StatelessWidget {
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                         colors: [
-                          Colors.white, // hoặc nền background phía dưới
+                          Colors.white,
                           Colors.white.withOpacity(0.0),
                         ],
                         stops: [0.0, 0.4],
@@ -88,49 +136,40 @@ class RecipeDetailScreen extends StatelessWidget {
                 ),
               ],
             ),
-
-            // Info section
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 30),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  InfoIcon(label: category, icon: categoryIcons[category] ?? Icons.restaurant),
-                  InfoIcon(label: time, icon: Icons.timer),
-                  InfoIcon(label: difficulty, icon: Icons.local_fire_department,),
+                  InfoIcon(label: widget.category, icon: categoryIcons[widget.category] ?? Icons.restaurant),
+                  InfoIcon(label: widget.time, icon: Icons.timer),
+                  InfoIcon(label: widget.difficulty, icon: Icons.local_fire_department),
                 ],
               ),
             ),
-
-            // YouTube video section
-            if (ytVideo.isNotEmpty)
+            if (widget.ytVideo.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: YoutubeVideoPlayer(videoUrl: ytVideo),
+                child: YoutubeVideoPlayer(videoUrl: widget.ytVideo),
               ),
-
             const SizedBox(height: 24),
-
-            // Ingredients
             SectionTitle(title: 'Nguyên liệu'),
-            ...List.generate(ingredients.length, (index) {
+            ...List.generate(widget.ingredients.length, (index) {
               final backgroundColor =
               index.isEven ? Colors.grey[200] : Colors.white;
               return Container(
                 color: backgroundColor,
                 width: double.infinity,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
                         child: Text(
-                          ' ${ingredients[index]}',
-                          style: TextStyle(fontSize: 18),
+                          ' ${widget.ingredients[index]}',
+                          style: const TextStyle(fontSize: 18),
                         ),
                       ),
                     ],
@@ -138,25 +177,19 @@ class RecipeDetailScreen extends StatelessWidget {
                 ),
               );
             }),
-
             const SizedBox(height: 24),
-
-            // Instructions
             SectionTitle(title: 'Cách làm'),
             ...List.generate(stepCount, (index) {
               return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Card(
                   elevation: 4,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: InstructionTile(
-                    title: '${index + 1}. ${instructions[index]}',
-                    detail: detail[index],
+                    title: '${index + 1}. ${widget.instructions[index]}',
+                    detail: widget.detail[index],
                   ),
                 ),
               );
@@ -244,7 +277,7 @@ class _InstructionTileState extends State<InstructionTile> {
       ),
       children: [
         Container(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           alignment: Alignment.centerLeft,
           child: Text(
             widget.detail,
