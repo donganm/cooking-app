@@ -8,6 +8,7 @@ class RecipeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isAsset = !item['image'].startsWith('http'); // Lấy đường dẫn ảnh và xác định là từ assets hay từ URL
     return Card(
       elevation: 8,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -19,11 +20,22 @@ class RecipeCard extends StatelessWidget {
         ),
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: Image.asset(
+          child:
+          isAsset
+              ? Image.asset(
             item['image'],
             width: 60,
             height: 60,
             fit: BoxFit.cover,
+          )
+              : Image.network(
+            item['image'],
+            width: 60,
+            height: 60,
+            fit: BoxFit.cover,
+            errorBuilder:
+                (context, error, stackTrace) =>
+            const Icon(Icons.broken_image),
           ),
         ),
         title: Text(

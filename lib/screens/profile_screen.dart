@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:btl_flutter_nhom6/screens/profile_manager/EditProfile_Screen.dart';
 import 'package:btl_flutter_nhom6/screens/profile_manager/ChangedPassword_Screen.dart';
 
+import 'favourite_list.dart';
+
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -145,7 +147,15 @@ void _onLogout(BuildContext context) async {
               ListTile(
                 leading: Icon(Icons.book,color: Colors.white),
                 title: Text("Tiramisu", style: TextStyle(color: Colors.white)),
-                trailing: Icon(Icons.favorite,color: Colors.blue),
+                trailing: IconButton(
+                  icon: const Icon(Icons.search, color: Colors.white),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => FavoriteScreen()),
+                    );
+                  },
+                ),
               )
             ]
           ),

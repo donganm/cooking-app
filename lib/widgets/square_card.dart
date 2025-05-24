@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:btl_flutter_nhom6/screens/recipe_detail_screen.dart';
-
 import '../screens/list_holder.dart';
 
 class SquareRecipeCard extends StatelessWidget {
@@ -52,20 +51,20 @@ class SquareRecipeCard extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child:
-                      isAsset
-                          ? Image.asset(
-                            imagePath,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                          )
-                          : Image.network(
-                            imagePath,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            errorBuilder:
-                                (context, error, stackTrace) =>
-                                    const Icon(Icons.broken_image),
-                          ),
+                    isAsset
+                    ? Image.asset(
+                      imagePath,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                    )
+                    : Image.network(
+                      imagePath,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      errorBuilder:
+                          (context, error, stackTrace) =>
+                              const Icon(Icons.broken_image),
+                    ),
                 ),
               ),
               Padding(
