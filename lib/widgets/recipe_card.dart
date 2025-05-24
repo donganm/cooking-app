@@ -48,17 +48,17 @@ class RecipeCard extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder:
-                  (context) => RecipeDetailScreen(
-                    title: item['title'],
-                    imageUrl: item['image'],
-                    time: item['time'],
-                    difficulty: item['difficulty'],
-                    ytVideo: item['ytVideo'],
-                    category: item['category'],
-                    ingredients: List<String>.from(item['ingredients']),
-                    instructions: List<String>.from(item['instructions']),
-                    detail: List<String>.from(item['detail']),
-                  ),
+                (context) => RecipeDetailScreen(
+                  title: item['title'],
+                  imageUrl: item['image'],
+                  time: item['time'],
+                  difficulty: item['difficulty'],
+                  ytVideo: item['ytVideo'],
+                  category: item['category'],
+                  ingredients: List<String>.from(item['ingredients']),
+                  instructions: List<String>.from(item['instructions']),
+                  detail: List<String>.from(item['detail']),
+                ),
             ),
           );
         },

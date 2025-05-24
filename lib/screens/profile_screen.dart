@@ -1,8 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:btl_flutter_nhom6/screens/profile_manager/EditProfile_Screen.dart';
 import 'package:btl_flutter_nhom6/screens/profile_manager/ChangedPassword_Screen.dart';
-
+import '../widgets/square_card.dart';
 import 'favourite_list.dart';
 
 
@@ -104,7 +105,7 @@ void _onLogout(BuildContext context) async {
         centerTitle: true,
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(8),
         children: [
           Center(
             child: Column(
@@ -118,6 +119,27 @@ void _onLogout(BuildContext context) async {
               ],
             ),
           ),
+          const SizedBox(height: 24),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Yêu thích', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => FavoriteScreen()),
+                    );
+                  },
+                  child: Text('Tất cả', style: TextStyle(color: Colors.blue, fontSize: 15)),
+                ),
+              ],
+            ),
+          ),
+          const FavoritedWidget(),
           const SizedBox(height: 24),
           _buildCard(
             title: "Bảo mật",
@@ -139,41 +161,10 @@ void _onLogout(BuildContext context) async {
               _buildTitle(Icons.logout, "Đăng xuất", () => _onLogout(context)),
             ],
           ),
+
           const SizedBox(height: 16),
-          _buildCard(
-            title: "Sách nấu ăn yêu thích", 
-            color: Colors.lightBlue, 
-            children: [
-              ListTile(
-                leading: Icon(Icons.book,color: Colors.white),
-                title: Text("Tiramisu", style: TextStyle(color: Colors.white)),
-                trailing: IconButton(
-                  icon: const Icon(Icons.search, color: Colors.white),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => FavoriteScreen()),
-                    );
-                  },
-                ),
-              )
-            ]
-          ),
+
           const SizedBox(height: 15),
-          _buildCard(
-            title: "Ưu dãi", 
-            color: const Color.fromARGB(255, 76, 190, 70), 
-            children: [
-              ListTile(
-                leading: Icon(Icons.local_offer,color: Colors.white),
-                title: Text("Voucher giảm 100% cho người mới", style: TextStyle(color: Colors.white)),
-              ),
-              ListTile(
-                leading: Icon(Icons.local_offer,color: Colors.white),
-                title: Text("Voucher giảm 10% khi nạp vip", style: TextStyle(color: Colors.white)),
-              ),
-            ]
-          ),
         ],
       ),
     );
@@ -212,6 +203,64 @@ void _onLogout(BuildContext context) async {
       title: Text(title, style: TextStyle(color: Colors.white)),
       trailing: Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
       onTap: onTap,
+    );
+  }
+}
+
+class FavoritedWidget extends StatefulWidget {
+  const FavoritedWidget({super.key});
+
+  @override
+  State<FavoritedWidget> createState() => _FavoritedWidgetState();
+}
+
+class _FavoritedWidgetState extends State<FavoritedWidget> {
+  List<Map<String, dynamic>> _randomFavorites = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadRandomFavorites();
+  }
+
+  Future<void> loadRandomFavorites() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    final favorites = List<String>.from(userDoc.data()?['favorites'] ?? []);
+
+    if (favorites.isEmpty) return;
+
+    final allRecipesSnapshot = await FirebaseFirestore.instance.collection('recipes').get();
+    final allFavorites = allRecipesSnapshot.docs
+        .where((doc) => favorites.contains(doc['title']))
+        .map((doc) => doc.data())
+        .toList();
+
+    allFavorites.shuffle();
+    setState(() {
+      _randomFavorites = allFavorites.toList();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_randomFavorites.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: List.generate(3, (index) {
+        final item = _randomFavorites[index];
+        return Expanded(
+          child: Container(
+            height: 150,
+            margin: const EdgeInsets.all(3),
+            child: SquareRecipeCard(item: item),
+          ),
+        );
+      }),
     );
   }
 }
