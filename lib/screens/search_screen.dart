@@ -3,6 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:btl_flutter_nhom6/widgets/recipe_card.dart';
 import 'package:btl_flutter_nhom6/screens/recipe_detail_screen.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:async';
+
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -10,6 +13,9 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  List<String> _searchHistory = [];
+  late String historyDocId;
+  Timer? _debounce;
   String _searchText = ""; // Biến lưu trữ từ khóa tìm kiếm
   //khoi tao speech to text
   late TextEditingController _controller;
@@ -21,6 +27,32 @@ class _SearchScreenState extends State<SearchScreen> {
     super.initState();
     speech = stt.SpeechToText();
     _controller = TextEditingController();
+    final user = FirebaseAuth.instance.currentUser; // 
+    if (user != null) {
+      historyDocId = user.uid; //  mỗi người dùng sẽ có 1 document riêng
+      loadSearchHistory(); //  chỉ gọi khi đã có uid
+    }
+  }
+  Future<void> loadSearchHistory() async {
+    final doc = await FirebaseFirestore.instance
+        .collection('searchHistories')
+        .doc(historyDocId)
+        .get();
+
+    if (doc.exists) {
+      final data = doc.data();
+      if (data != null && data.containsKey('history')) {
+        setState(() {
+          _searchHistory = List<String>.from(data['history']);
+        });
+      }
+    }
+  }
+
+  Future<void> saveSearchHistory() async {
+    await FirebaseFirestore.instance.collection('searchHistories').doc(historyDocId).set({
+      'history': _searchHistory,
+    }, SetOptions(merge: true));
   }
   void onlisten() async{
     if(!isListening){
@@ -28,27 +60,48 @@ class _SearchScreenState extends State<SearchScreen> {
         onStatus:(val) => print('onStatus: $val'),
         onError: (val) => print('onError: $val')
       );
-      if(available){
+      if (available) {
         setState(() {
-          isListening=true;
+          isListening = true;
         });
-        speech.listen(
-          onResult: (val) => setState(()=>{
-            _searchText = val.recognizedWords,
-            _controller.text = val.recognizedWords,
+        speech.listen(onResult: (val) => setState(() {
+              _searchText = val.recognizedWords;
+              _controller.text = val.recognizedWords;
             _controller.selection = TextSelection.fromPosition(
               TextPosition(offset: _controller.text.length),
-            ),
-          })
-        );
+          );
+              _addToSearchHistory(val.recognizedWords); // Lưu lịch sử khi dùng mic
+            }));
       }
-    }else{
+    } else {
       setState(() {
         isListening = false;
       });
       speech.stop();
     }
 
+  }
+  void _addToSearchHistory(String keyword) {
+    keyword = keyword.trim();
+    if (keyword.length < 3) return; // ✅ Bỏ qua từ quá ngắn
+    if (_searchHistory.contains(keyword)) return; // ✅ Không lưu trùng lặp
+    if (keyword.isEmpty) return;
+    if (_searchHistory.contains(keyword)) return;
+
+    setState(() {
+      _searchHistory.insert(0, keyword);
+      if (_searchHistory.length > 3) {
+        _searchHistory = _searchHistory.sublist(0, 3);
+      }
+    });
+    saveSearchHistory();
+  }
+  @override
+  void dispose() {
+  _debounce?.cancel();
+  _controller.dispose();
+  speech.stop();
+  super.dispose();
   }
   @override
   Widget build(BuildContext context) {
@@ -89,10 +142,57 @@ class _SearchScreenState extends State<SearchScreen> {
                   setState(() {
                     _searchText = value; // Cập nhật từ khóa tìm kiếm
                   });
+                  
+                  // ✅ Debounce: nếu người dùng tiếp tục gõ, hủy timer cũ
+                  if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+                  // ✅ Đợi 800ms sau khi người dùng ngừng gõ mới lưu
+                  _debounce = Timer(const Duration(milliseconds: 1000), () {
+                    if (value.trim().isNotEmpty) {
+                      _addToSearchHistory(value);
+                    }
+                  });
+  
+                },
+              ),
+            ),
+            // ✅ Hiển thị lịch sử tìm kiếm khi chưa nhập gì
+            if (_searchText.isEmpty && _searchHistory.isNotEmpty)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      'Lịch sử tìm kiếm:',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                  ),
+
+                  ///  Giới hạn chiều cao vùng hiển thị lịch sử (200 là ví dụ, có thể điều chỉnh)
+                  SizedBox(
+                    height: 100,
+                    child: ListView.builder(
+                      itemCount: _searchHistory.length,
+                      itemBuilder: (context, index) {
+                        final keyword = _searchHistory[index];
+                        return ListTile(
+                          title: Text(keyword),
+                          leading: Icon(Icons.history),
+                          onTap: () {
+                            setState(() {
+                              _searchText = keyword;
+                              _controller.text = keyword;
+                            });
+                          },
+                        );
                 },
               ),
             ),
 
+                  const Divider(),
+                ],
+              ),
             // 📃 Danh sách kết quả tìm kiếm
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
