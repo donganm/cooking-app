@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -11,8 +12,7 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
   Future<void> _signUp() async {
     if (_passwordController.text.trim() !=
@@ -24,10 +24,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
 
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+
+      final user = userCredential.user;
+      await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
+        'email': user.email,
+        'favorites': [],
+        'createdAt': FieldValue.serverTimestamp(),
+      });
 
       ScaffoldMessenger.of(
         context,

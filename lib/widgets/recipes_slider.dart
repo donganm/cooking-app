@@ -15,7 +15,7 @@ class _RecipeSliderState extends State<RecipeSlider> {
   int _currentPage = 0;
   Timer? _autoScrollTimer;
 
-  final int maxSlides = 7;
+  final int maxSlides = 6;
   List<Map<String, dynamic>> recipes = [];
 
   @override
@@ -25,10 +25,8 @@ class _RecipeSliderState extends State<RecipeSlider> {
   }
 
   Future<void> _fetchRecipes() async {
-    final snapshot =
-        await FirebaseFirestore.instance.collection('recipes').get();
-    List<Map<String, dynamic>> fetched =
-        snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+    final snapshot = await FirebaseFirestore.instance.collection('recipes').get();
+    List<Map<String, dynamic>> fetched = snapshot.docs.map((doc) => doc.data()).toList();
     fetched.shuffle();
     if (fetched.length > maxSlides) {
       fetched = fetched.sublist(0, maxSlides);
@@ -80,6 +78,8 @@ class _RecipeSliderState extends State<RecipeSlider> {
               onPageChanged: (index) => setState(() => _currentPage = index),
               itemBuilder: (context, index) {
                 final recipe = recipes[index];
+                final bool isAsset = !recipe['image'].startsWith('http');
+
                 return Container(
                   margin: const EdgeInsets.symmetric(
                     horizontal: 5,
@@ -98,11 +98,22 @@ class _RecipeSliderState extends State<RecipeSlider> {
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(15),
-                                child: Image.asset(
+                                child:
+                                isAsset
+                                  ? Image.asset(
                                   recipe['image'],
-                                  height: 200,
                                   width: double.infinity,
+                                  height: 200,
                                   fit: BoxFit.cover,
+                                )
+                                  : Image.network(
+                                  recipe['image'],
+                                  width: double.infinity,
+                                  height: 200,
+                                  fit: BoxFit.cover,
+                                  errorBuilder:
+                                      (context, error, stackTrace) =>
+                                  const Icon(Icons.broken_image),
                                 ),
                               ),
                               Padding(

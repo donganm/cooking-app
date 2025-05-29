@@ -1,0 +1,34 @@
+[33m0295a6a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mtrung[m[33m, [m[1;31morigin/trung[m[33m)[m HEAD@{0}: checkout: moving from main to trung
+[33mb536e42[m[33m ([m[1;32mmain[m[33m)[m HEAD@{1}: commit: UI update
+[33m6f74f27[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{2}: reset: moving to origin/main
+[33m8e7e3ff[m HEAD@{3}: reset: moving to origin/main
+[33m8e7e3ff[m HEAD@{4}: reset: moving to origin/main
+[33m6963b6b[m HEAD@{5}: reset: moving to origin/main
+[33m3a5a2b0[m HEAD@{6}: commit: YT video và cập nhật ui
+[33m1ed1d12[m HEAD@{7}: commit (amend): widget category, recipe card
+[33md3b0d8c[m HEAD@{8}: commit (amend): widget catagory, card
+[33m61db1de[m HEAD@{9}: commit (amend): Tên commit mới
+[33m349b014[m HEAD@{10}: pull origin main --rebase (finish): returning to refs/heads/main
+[33m349b014[m HEAD@{11}: pull origin main --rebase (pick): thêm widget catalog, card
+[33mfa0efde[m HEAD@{12}: pull origin main --rebase (start): checkout fa0efded1ea313e7274c2f68c9b8efb9f6b1110a
+[33m6d3c311[m HEAD@{13}: commit: thêm widget catalog, card
+[33m30ef211[m HEAD@{14}: reset: moving to origin/main
+[33m12d9356[m HEAD@{15}: reset: moving to 12d9356
+[33m30ef211[m HEAD@{16}: reset: moving to origin/main
+[33m12d9356[m HEAD@{17}: reset: moving to HEAD
+[33m12d9356[m HEAD@{18}: checkout: moving from main to main
+[33m12d9356[m HEAD@{19}: checkout: moving from main to main
+[33m12d9356[m HEAD@{20}: commit (merge): update
+[33mfccf8ad[m HEAD@{21}: checkout: moving from main to main
+[33mfccf8ad[m HEAD@{22}: checkout: moving from main to main
+[33mfccf8ad[m HEAD@{23}: commit: update
+[33m0295a6a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mtrung[m[33m, [m[1;31morigin/trung[m[33m)[m HEAD@{24}: checkout: moving from trung to main
+[33m0295a6a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mtrung[m[33m, [m[1;31morigin/trung[m[33m)[m HEAD@{25}: reset: moving to HEAD
+[33m0295a6a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mtrung[m[33m, [m[1;31morigin/trung[m[33m)[m HEAD@{26}: checkout: moving from trung to trung
+[33m0295a6a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mtrung[m[33m, [m[1;31morigin/trung[m[33m)[m HEAD@{27}: checkout: moving from main to trung
+[33m0295a6a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mtrung[m[33m, [m[1;31morigin/trung[m[33m)[m HEAD@{28}: reset: moving to HEAD
+[33m0295a6a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mtrung[m[33m, [m[1;31morigin/trung[m[33m)[m HEAD@{29}: reset: moving to HEAD
+[33m0295a6a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mtrung[m[33m, [m[1;31morigin/trung[m[33m)[m HEAD@{30}: checkout: moving from trung to main
+[33m0295a6a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mtrung[m[33m, [m[1;31morigin/trung[m[33m)[m HEAD@{31}: commit: update
+[33mc3b1aed[m[33m ([m[1;31morigin/master[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{32}: checkout: moving from master to trung
+[33mc3b1aed[m[33m ([m[1;31morigin/master[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{33}: commit (initial): add
