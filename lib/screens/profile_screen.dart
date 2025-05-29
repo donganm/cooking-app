@@ -1,14 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-<<<<<<< Updated upstream
-
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-  void _onEditProfile() {} //them cn sau khi co db
-  void _onChangedPassword() {}
-  void _onDeleteAccount() {}
-  void _onLogout() {}
-=======
 import 'package:btl_flutter_nhom6/screens/profile_manager/EditProfile_Screen.dart';
 import 'package:btl_flutter_nhom6/screens/profile_manager/ChangedPassword_Screen.dart';
 import '../widgets/square_card.dart';
@@ -108,7 +100,6 @@ class ProfileScreen extends StatelessWidget {
     }
   }
 
->>>>>>> Stashed changes
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -121,18 +112,11 @@ class ProfileScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(8),
         children: [
           Center(
             child: Column(
               children: [
-<<<<<<< Updated upstream
-                const CircleAvatar(radius: 50, backgroundColor: Colors.red),
-                const SizedBox(height: 10),
-                const Text(
-                  "Tên người dùng",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-=======
                 const CircleAvatar(
                   radius: 50,
                   backgroundImage: NetworkImage(
@@ -146,14 +130,11 @@ class ProfileScreen extends StatelessWidget {
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
->>>>>>> Stashed changes
                 ),
               ],
             ),
           ),
           const SizedBox(height: 24),
-<<<<<<< Updated upstream
-=======
 
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -181,21 +162,10 @@ class ProfileScreen extends StatelessWidget {
           ),
           const FavoritedWidget(),
           const SizedBox(height: 24),
->>>>>>> Stashed changes
           _buildCard(
             title: "Bảo mật",
             color: Colors.green,
             children: [
-<<<<<<< Updated upstream
-              _buildTitle(Icons.edit, "Sửa thông tin", _onEditProfile),
-              _buildTitle(Icons.lock, "Đổi mật khẩu ", _onChangedPassword),
-              _buildTitle(
-                Icons.delete_forever,
-                "Xóa tài khoản",
-                _onDeleteAccount,
-              ),
-              _buildTitle(Icons.logout, "Đăng xuất", _onLogout),
-=======
               _buildTitle(Icons.edit, "Sửa thông tin", () {
                 Navigator.push(
                   context,
@@ -216,42 +186,12 @@ class ProfileScreen extends StatelessWidget {
                 () => _onDeleteAccount(context),
               ),
               _buildTitle(Icons.logout, "Đăng xuất", () => _onLogout(context)),
->>>>>>> Stashed changes
             ],
           ),
+
           const SizedBox(height: 16),
-          _buildCard(
-            title: "Sách nấu ăn yêu thích",
-            color: Colors.lightBlue,
-            children: [
-              ListTile(
-                leading: Icon(Icons.book, color: Colors.white),
-                title: Text("Tiramisu", style: TextStyle(color: Colors.white)),
-                trailing: Icon(Icons.favorite, color: Colors.blue),
-              ),
-            ],
-          ),
+
           const SizedBox(height: 15),
-          _buildCard(
-            title: "Ưu dãi",
-            color: const Color.fromARGB(255, 76, 190, 70),
-            children: [
-              ListTile(
-                leading: Icon(Icons.local_offer, color: Colors.white),
-                title: Text(
-                  "Voucher giảm 100% cho người mới",
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              ListTile(
-                leading: Icon(Icons.local_offer, color: Colors.white),
-                title: Text(
-                  "Voucher giảm 10% khi nạp vip",
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );
@@ -293,8 +233,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 }
-<<<<<<< Updated upstream
-=======
 
 class FavoritedWidget extends StatefulWidget {
   const FavoritedWidget({super.key});
@@ -344,13 +282,9 @@ class _FavoritedWidgetState extends State<FavoritedWidget> {
     if (_randomFavorites.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
-
-    final int displayCount =
-        _randomFavorites.length < 3 ? _randomFavorites.length : 3;
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List.generate(displayCount, (index) {
+      children: List.generate(3, (index) {
         final item = _randomFavorites[index];
         return Expanded(
           child: Container(
@@ -363,4 +297,3 @@ class _FavoritedWidgetState extends State<FavoritedWidget> {
     );
   }
 }
->>>>>>> Stashed changes
