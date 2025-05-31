@@ -5,6 +5,7 @@ import 'package:btl_flutter_nhom6/screens/profile_manager/EditProfile_Screen.dar
 import 'package:btl_flutter_nhom6/screens/profile_manager/ChangedPassword_Screen.dart';
 import 'package:btl_flutter_nhom6/services/user_auth_service.dart';
 import 'package:btl_flutter_nhom6/screens/UploadRecipe.dart';
+import 'package:btl_flutter_nhom6/screens/login_screen.dart';
 import '../widgets/square_card.dart';
 import 'favourite_list.dart';
 
@@ -130,6 +131,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final Color mau = const Color.fromARGB(255, 255, 64, 129);
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Trang cá nhân"),
+        centerTitle: true,
+        backgroundColor: Colors.pink,
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => LoginScreen()),
+            );
+          },
+          child: const Text("Đăng nhập để tiếp tục"),
+        ),
+      ),
+    );
+  }
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
