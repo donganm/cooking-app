@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:btl_flutter_nhom6/tabs/all_orders_tab.dart';
 import 'package:btl_flutter_nhom6/tabs/saved_order_tab.dart';
 import 'package:btl_flutter_nhom6/tabs/my_dishes_tab.dart';
-import 'package:btl_flutter_nhom6/tabs/reviews_tab.dart';
+
 import 'package:btl_flutter_nhom6/tabs/drafts_tab.dart';
 
 void main() => runApp(MyApp());
@@ -35,7 +35,7 @@ class OrderPage extends StatelessWidget {
               Tab(text: "Tất cả"),
               Tab(text: "Đã lưu"),
               Tab(text: "Món của tôi"),
-              Tab(text: "Đánh giá"),
+
               Tab(text: "Món nháp"),
             ],
           ),
@@ -47,9 +47,9 @@ class OrderPage extends StatelessWidget {
         body: TabBarView(
           children: [
             AllOrdersTab(),
-            SavedOrdersTab(),
+            SavedOrderTab(),
             MyDishesTab(),
-            ReviewsTab(),
+
             DraftsTab(),
           ],
         ),
