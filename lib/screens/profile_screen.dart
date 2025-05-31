@@ -3,16 +3,43 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:btl_flutter_nhom6/screens/profile_manager/EditProfile_Screen.dart';
 import 'package:btl_flutter_nhom6/screens/profile_manager/ChangedPassword_Screen.dart';
+import 'package:btl_flutter_nhom6/services/user_auth_service.dart';
+import 'package:btl_flutter_nhom6/screens/UploadRecipe.dart';
 import '../widgets/square_card.dart';
 import 'favourite_list.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
-  void _onEditProfile(BuildContext context) {
-    Navigator.push(
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String displayName = "Chef";
+  final AuthService _authService = AuthService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final userData = await _authService.getUserData();
+    if (userData != null && userData['fullname'] != null && userData['fullname'].toString().isNotEmpty) {
+      setState(() {
+        displayName = userData['fullname'];
+      });
+    }
+  }
+
+  Future<void> _onEditProfile(BuildContext context) async {
+    await Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const EditProfileScreen()),
     );
+    await _loadUserData();
   }
 
   void _onChangedPassword(BuildContext context) {
@@ -24,26 +51,22 @@ class ProfileScreen extends StatelessWidget {
 
   void _onDeleteAccount(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
-
     final confirm = await showDialog<bool>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: const Text("Xóa tài khoản"),
-            content: Text(
-              "Bạn có chắc chắn muốn xóa tài khoản email:\n${user?.email}?",
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(false),
-                child: const Text("Hủy"),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(true),
-                child: const Text("Xóa"),
-              ),
-            ],
+      builder: (ctx) => AlertDialog(
+        title: const Text("Xóa tài khoản"),
+        content: Text("Bạn có chắc chắn muốn xóa tài khoản email:\n${user?.email}?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text("Hủy"),
           ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text("Xóa"),
+          ),
+        ],
+      ),
     );
 
     if (confirm != true) return;
@@ -59,41 +82,45 @@ class ProfileScreen extends StatelessWidget {
 
       showDialog(
         context: context,
-        builder:
-            (ctx) => AlertDialog(
-              title: const Text("Lỗi"),
-              content: Text(message),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  child: const Text("OK"),
-                ),
-              ],
-            ),
+        builder: (ctx) => AlertDialog(
+          title: const Text("Lỗi"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text("OK"),
+            )
+          ],
+        ),
       );
     }
+  }
+
+  void _onPost(BuildContext context) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const UploadRecipe()),
+    );
   }
 
   void _onLogout(BuildContext context) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: const Text("Xác nhận đăng xuất"),
-            content: const Text("Bạn có chắc chắn muốn đăng xuất không?"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(false),
-                child: const Text("Hủy"),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(true),
-                child: const Text("Đăng xuất"),
-              ),
-            ],
+      builder: (ctx) => AlertDialog(
+        title: const Text("Xác nhận đăng xuất"),
+        content: const Text("Bạn có chắc chắn muốn đăng xuất không?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text("Hủy"),
           ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text("Đăng xuất"),
+          ),
+        ],
+      ),
     );
-
     if (confirm == true) {
       await FirebaseAuth.instance.signOut();
       Navigator.pushReplacementNamed(context, '/login');
@@ -102,7 +129,6 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
     final Color mau = const Color.fromARGB(255, 255, 64, 129);
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -125,11 +151,8 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  "Tên người dùng: ${user != null && user.email != null ? user.email!.split('@')[0] : "Chef"}",
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  "Tên người dùng: $displayName",
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -141,55 +164,54 @@ class ProfileScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Yêu thích',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
+                const Text('Yêu thích', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => FavoriteScreen()),
+                      MaterialPageRoute(builder: (context) => const FavoriteScreen()),
                     );
                   },
-                  child: Text(
-                    'Tất cả',
-                    style: TextStyle(color: Colors.blue, fontSize: 15),
-                  ),
+                  child: const Text('Tất cả', style: TextStyle(color: Colors.blue, fontSize: 15)),
                 ),
               ],
             ),
           ),
           const FavoritedWidget(),
           const SizedBox(height: 24),
+
           _buildCard(
             title: "Bảo mật",
             color: Colors.green,
             children: [
-              _buildTitle(Icons.edit, "Sửa thông tin", () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const EditProfileScreen()),
-                );
-              }),
-              _buildTitle(Icons.lock, "Đổi mật khẩu", () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const ChangedPasswordScreen(),
-                  ),
-                );
-              }),
-              _buildTitle(
-                Icons.delete_forever,
-                "Xóa tài khoản",
-                () => _onDeleteAccount(context),
-              ),
+              _buildTitle(Icons.edit, "Sửa thông tin", () => _onEditProfile(context)),
+              _buildTitle(Icons.lock, "Đổi mật khẩu", () => _onChangedPassword(context)),
+              _buildTitle(Icons.delete_forever, "Xóa tài khoản", () => _onDeleteAccount(context)),
               _buildTitle(Icons.logout, "Đăng xuất", () => _onLogout(context)),
             ],
           ),
 
           const SizedBox(height: 16),
+          _buildCard(
+            title: "Bài đăng",
+            color: Colors.deepPurple,
+            children: [
+              _buildTitle(Icons.post_add, "Đăng bài mới", () => _onPost(context)),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+          _buildCard(
+            title: "Sách nấu ăn yêu thích",
+            color: Colors.lightBlue,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.book, color: Colors.white),
+                title: const Text("Tiramisu", style: TextStyle(color: Colors.white)),
+                trailing: const Icon(Icons.favorite, color: Colors.blue),
+              ),
+            ],
+          ),
 
           const SizedBox(height: 15),
         ],
@@ -197,11 +219,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCard({
-    required String title,
-    required Color color,
-    required List<Widget> children,
-  }) {
+  Widget _buildCard({required String title, required Color color, required List<Widget> children}) {
     return Container(
       decoration: BoxDecoration(
         color: color,
@@ -215,7 +233,7 @@ class ProfileScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Text(
               title,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           ...children,
@@ -227,8 +245,8 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildTitle(IconData icon, String title, VoidCallback onTap) {
     return ListTile(
       leading: Icon(icon, color: Colors.yellow),
-      title: Text(title, style: TextStyle(color: Colors.white)),
-      trailing: Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
+      title: Text(title, style: const TextStyle(color: Colors.white)),
+      trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
       onTap: onTap,
     );
   }
@@ -254,26 +272,20 @@ class _FavoritedWidgetState extends State<FavoritedWidget> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    final userDoc =
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
+    final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
     final favorites = List<String>.from(userDoc.data()?['favorites'] ?? []);
 
     if (favorites.isEmpty) return;
 
-    final allRecipesSnapshot =
-        await FirebaseFirestore.instance.collection('recipes').get();
-    final allFavorites =
-        allRecipesSnapshot.docs
-            .where((doc) => favorites.contains(doc['title']))
-            .map((doc) => doc.data())
-            .toList();
+    final allRecipesSnapshot = await FirebaseFirestore.instance.collection('recipes').get();
+    final allFavorites = allRecipesSnapshot.docs
+        .where((doc) => favorites.contains(doc['title']))
+        .map((doc) => doc.data())
+        .toList();
 
     allFavorites.shuffle();
     setState(() {
-      _randomFavorites = allFavorites.toList();
+      _randomFavorites = allFavorites.take(3).toList();
     });
   }
 
@@ -284,7 +296,7 @@ class _FavoritedWidgetState extends State<FavoritedWidget> {
     }
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List.generate(3, (index) {
+      children: List.generate(_randomFavorites.length, (index) {
         final item = _randomFavorites[index];
         return Expanded(
           child: Container(
