@@ -50,9 +50,9 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 10, // Độ nổi của thanh điều hướng
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Trang chủ'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Tìm kiếm'),
           // BottomNavigationBarItem(icon: Icon(Icons.shopping_bag),label: 'Món mới'),
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Kho món'),
+          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Nhóm'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Cá nhân'),
         ],
       ),
