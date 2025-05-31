@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:btl_flutter_nhom6/screens/search_screen.dart';
 import 'package:btl_flutter_nhom6/screens/shoplist_screen.dart';
-import 'package:btl_flutter_nhom6/screens/profile_screen.dart';
 import 'package:btl_flutter_nhom6/screens/home_page.dart';
 import 'package:btl_flutter_nhom6/screens/history_screen.dart';
+import 'package:btl_flutter_nhom6/screens/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
