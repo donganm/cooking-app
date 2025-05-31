@@ -27,7 +27,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _loadUserData() async {
     final userData = await _authService.getUserData();
-    if (userData != null && userData['fullname'] != null && userData['fullname'].toString().isNotEmpty) {
+    if (userData != null &&
+        userData['fullname'] != null &&
+        userData['fullname'].toString().isNotEmpty) {
       setState(() {
         displayName = userData['fullname'];
       });
@@ -53,20 +55,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = FirebaseAuth.instance.currentUser;
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("Xóa tài khoản"),
-        content: Text("Bạn có chắc chắn muốn xóa tài khoản email:\n${user?.email}?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text("Hủy"),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text("Xóa tài khoản"),
+            content: Text(
+              "Bạn có chắc chắn muốn xóa tài khoản email:\n${user?.email}?",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text("Hủy"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: const Text("Xóa"),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text("Xóa"),
-          ),
-        ],
-      ),
     );
 
     if (confirm != true) return;
@@ -82,16 +87,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       showDialog(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text("Lỗi"),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text("OK"),
-            )
-          ],
-        ),
+        builder:
+            (ctx) => AlertDialog(
+              title: const Text("Lỗi"),
+              content: Text(message),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
       );
     }
   }
@@ -106,20 +112,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _onLogout(BuildContext context) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("Xác nhận đăng xuất"),
-        content: const Text("Bạn có chắc chắn muốn đăng xuất không?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text("Hủy"),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text("Xác nhận đăng xuất"),
+            content: const Text("Bạn có chắc chắn muốn đăng xuất không?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text("Hủy"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: const Text("Đăng xuất"),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text("Đăng xuất"),
-          ),
-        ],
-      ),
     );
     if (confirm == true) {
       await FirebaseAuth.instance.signOut();
@@ -152,7 +159,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 10),
                 Text(
                   "Tên người dùng: $displayName",
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -164,15 +174,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Yêu thích', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                const Text(
+                  'Yêu thích',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const FavoriteScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const FavoriteScreen(),
+                      ),
                     );
                   },
-                  child: const Text('Tất cả', style: TextStyle(color: Colors.blue, fontSize: 15)),
+                  child: const Text(
+                    'Tất cả',
+                    style: TextStyle(color: Colors.blue, fontSize: 15),
+                  ),
                 ),
               ],
             ),
@@ -184,9 +202,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
             title: "Bảo mật",
             color: Colors.green,
             children: [
-              _buildTitle(Icons.edit, "Sửa thông tin", () => _onEditProfile(context)),
-              _buildTitle(Icons.lock, "Đổi mật khẩu", () => _onChangedPassword(context)),
-              _buildTitle(Icons.delete_forever, "Xóa tài khoản", () => _onDeleteAccount(context)),
+              _buildTitle(
+                Icons.edit,
+                "Sửa thông tin",
+                () => _onEditProfile(context),
+              ),
+              _buildTitle(
+                Icons.lock,
+                "Đổi mật khẩu",
+                () => _onChangedPassword(context),
+              ),
+              _buildTitle(
+                Icons.delete_forever,
+                "Xóa tài khoản",
+                () => _onDeleteAccount(context),
+              ),
               _buildTitle(Icons.logout, "Đăng xuất", () => _onLogout(context)),
             ],
           ),
@@ -196,7 +226,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             title: "Bài đăng",
             color: Colors.deepPurple,
             children: [
-              _buildTitle(Icons.post_add, "Đăng bài mới", () => _onPost(context)),
+              _buildTitle(
+                Icons.post_add,
+                "Đăng bài mới",
+                () => _onPost(context),
+              ),
             ],
           ),
 
@@ -207,7 +241,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               ListTile(
                 leading: const Icon(Icons.book, color: Colors.white),
-                title: const Text("Tiramisu", style: TextStyle(color: Colors.white)),
+                title: const Text(
+                  "Tiramisu",
+                  style: TextStyle(color: Colors.white),
+                ),
                 trailing: const Icon(Icons.favorite, color: Colors.blue),
               ),
             ],
@@ -219,7 +256,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildCard({required String title, required Color color, required List<Widget> children}) {
+  Widget _buildCard({
+    required String title,
+    required Color color,
+    required List<Widget> children,
+  }) {
     return Container(
       decoration: BoxDecoration(
         color: color,
@@ -246,7 +287,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return ListTile(
       leading: Icon(icon, color: Colors.yellow),
       title: Text(title, style: const TextStyle(color: Colors.white)),
-      trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
+      trailing: const Icon(
+        Icons.arrow_forward_ios,
+        color: Colors.white,
+        size: 16,
+      ),
       onTap: onTap,
     );
   }
@@ -272,16 +317,22 @@ class _FavoritedWidgetState extends State<FavoritedWidget> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    final userDoc =
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
     final favorites = List<String>.from(userDoc.data()?['favorites'] ?? []);
 
     if (favorites.isEmpty) return;
 
-    final allRecipesSnapshot = await FirebaseFirestore.instance.collection('recipes').get();
-    final allFavorites = allRecipesSnapshot.docs
-        .where((doc) => favorites.contains(doc['title']))
-        .map((doc) => doc.data())
-        .toList();
+    final allRecipesSnapshot =
+        await FirebaseFirestore.instance.collection('recipes').get();
+    final allFavorites =
+        allRecipesSnapshot.docs
+            .where((doc) => favorites.contains(doc['title']))
+            .map((doc) => doc.data())
+            .toList();
 
     allFavorites.shuffle();
     setState(() {

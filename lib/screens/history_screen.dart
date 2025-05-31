@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Đơn hàng',
+      title: 'Nhóm',
       theme: ThemeData(primarySwatch: Colors.deepOrange, fontFamily: 'Roboto'),
       home: OrderPage(),
     );
