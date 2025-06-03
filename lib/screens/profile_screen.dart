@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:btl_flutter_nhom6/screens/profile_manager/EditProfile_Screen.dart';
 import 'package:btl_flutter_nhom6/screens/profile_manager/ChangedPassword_Screen.dart';
@@ -268,20 +269,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 16),
           _buildCard(
-            title: "Sách nấu ăn yêu thích",
+            title: "Nếu bạn là Admin/Kiểm duyệt viên",
             color: Colors.lightBlue,
             children: [
               ListTile(
                 leading: const Icon(Icons.book, color: Colors.white),
                 title: const Text(
-                  "Tiramisu",
+                  "Quản lý bài đăng",
                   style: TextStyle(color: Colors.white),
                 ),
                 trailing: const Icon(Icons.favorite, color: Colors.blue),
+                onTap: () async {
+                  final url = Uri.parse("https://apicookapp.onrender.com");
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                  } else {
+                    throw 'Không mở được liên kết $url';
+                  }
+                },
               ),
             ],
           ),
-
           const SizedBox(height: 15),
         ],
       ),

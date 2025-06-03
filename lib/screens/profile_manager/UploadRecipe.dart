@@ -54,7 +54,7 @@ class _UploadRecipeState extends State<UploadRecipe> {
         'instructions': instructions.split('.').map((e) => e.trim()).where((e) => e.isNotEmpty).toList(),
         'detail': detail.split(',').map((e) => e.trim()).toList(),
         'createdAt': FieldValue.serverTimestamp(),
-        'approved': false,
+        'approved': true,
         'userId': user.uid,
       });
 
