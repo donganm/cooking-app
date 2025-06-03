@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UploadRecipe extends StatefulWidget {
   const UploadRecipe({Key? key}) : super(key: key);
@@ -27,6 +28,13 @@ class _UploadRecipeState extends State<UploadRecipe> {
   final CollectionReference recipeWaitCollection = FirebaseFirestore.instance.collection('recipe_wait');
 
   Future<void> _submitRecipe() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Bạn cần đăng nhập để đăng bài.')),
+      );
+      return;
+    }
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
@@ -47,6 +55,7 @@ class _UploadRecipeState extends State<UploadRecipe> {
         'detail': detail.split(',').map((e) => e.trim()).toList(),
         'createdAt': FieldValue.serverTimestamp(),
         'approved': false,
+        'userId': user.uid,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(

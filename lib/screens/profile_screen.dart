@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:btl_flutter_nhom6/screens/profile_manager/EditProfile_Screen.dart';
 import 'package:btl_flutter_nhom6/screens/profile_manager/ChangedPassword_Screen.dart';
+import 'package:btl_flutter_nhom6/screens/profile_manager/CheckRecipeStatus.dart';
 import 'package:btl_flutter_nhom6/services/user_auth_service.dart';
-import 'package:btl_flutter_nhom6/screens/UploadRecipe.dart';
+import 'package:btl_flutter_nhom6/screens/profile_manager/UploadRecipe.dart';
+import 'package:btl_flutter_nhom6/screens/login_screen.dart';
 import '../widgets/square_card.dart';
 import 'favourite_list.dart';
 
@@ -109,6 +111,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  void _recipeStatus(BuildContext context) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const CheckRecipeStatus())
+    );
+  }
+
   void _onLogout(BuildContext context) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -137,6 +146,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final Color mau = const Color.fromARGB(255, 255, 64, 129);
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text("Trang cá nhân"),
+          centerTitle: true,
+          backgroundColor: Colors.pink,
+        ),
+        body: Center(
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => LoginScreen()),
+              );
+            },
+            child: const Text("Đăng nhập để tiếp tục"),
+          ),
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -231,9 +261,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 "Đăng bài mới",
                 () => _onPost(context),
               ),
+              _buildTitle(Icons.post_add,
+               "Trạng thái bài đăng", 
+               () => _recipeStatus(context))
             ],
           ),
-
           const SizedBox(height: 16),
           _buildCard(
             title: "Sách nấu ăn yêu thích",

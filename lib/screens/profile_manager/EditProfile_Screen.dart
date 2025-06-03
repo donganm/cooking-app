@@ -86,7 +86,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Chỉnh sửa thông tin cá nhân"),
+        title: const Text("Profile"),
         backgroundColor: Colors.green,
       ),
       body: Padding(
