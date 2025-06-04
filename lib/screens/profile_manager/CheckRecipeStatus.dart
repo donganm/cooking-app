@@ -53,15 +53,32 @@ class _CheckRecipeStatusState extends State<CheckRecipeStatus> {
       itemCount: recipes.length,
       itemBuilder: (context, index) {
         final recipe = recipes[index];
-
-        return Card(
+          return Card(
           margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
           child: ExpansionTile(
             leading: recipe['image'] != null && recipe['image'] != ''
-                ? Image.network(recipe['image'], width: 60, height: 60, fit: BoxFit.cover)
-                : const Icon(Icons.food_bank),
+                ? Image.network(
+                    recipe['image'],
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.network(
+                        'https://thumb.ac-illust.com/b1/b170870007dfa419295d949814474ab2_t.jpeg',
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                      );
+                    },
+                  )
+                : Image.network(
+                    'https://thumb.ac-illust.com/b1/b170870007dfa419295d949814474ab2_t.jpeg',
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                  ),
             title: Text(recipe['title'] ?? 'Không có tiêu đề'),
-            subtitle: Text('Trạng thái: ${recipe['approved'] == false ? "Đã duyệt" : "Chờ duyệt"}'),
+            subtitle: Text('Trạng thái: ${recipe['approved'] == true ? "Chờ duyệt" : "Đã duyệt"}'),
             childrenPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             children: [
               if (recipe['category'] != null)
@@ -71,13 +88,14 @@ class _CheckRecipeStatusState extends State<CheckRecipeStatus> {
               if (recipe['time'] != null)
                 Text('Thời gian: ${recipe['time']} phút'),
               if (recipe['tags'] != null && recipe['tags'] is List)
-                Text('Tag của bài viết: ${recipe['tags']}')
+                Text('Tag của bài viết: ${recipe['tags']}'),
             ],
           ),
         );
       },
     );
   }
+
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -88,17 +106,47 @@ class _CheckRecipeStatusState extends State<CheckRecipeStatus> {
 
     if (errorMessage != null) {
       return Scaffold(
+        appBar: AppBar(
+          title: const Text('Đóng góp công thức'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              tooltip: 'Làm mới',
+              onPressed: () {
+                setState(() {
+                  isLoading = true;
+                  errorMessage = null;
+                });
+                fetchRecipes();
+              },
+            ),
+          ],
+        ),
         body: Center(child: Text('Lỗi: $errorMessage')),
       );
     }
 
     final approvedList = data?['approved'] ?? [];
     final waitingList = data?['waiting'] ?? [];
-
     final bool hasRecipes = approvedList.isNotEmpty || waitingList.isNotEmpty;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Trạng thái bài đăng của bạn')),
+      appBar: AppBar(
+        title: const Text('Đóng góp công thức'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Làm mới',
+            onPressed: () {
+              setState(() {
+                isLoading = true;
+                errorMessage = null;
+              });
+              fetchRecipes();
+            },
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: hasRecipes
