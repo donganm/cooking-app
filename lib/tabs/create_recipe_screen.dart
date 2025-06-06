@@ -149,7 +149,10 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Đăng món mới'),
+          title: Text(
+            'Đăng món mới',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+          ),
           leading: IconButton(
             icon: Icon(Icons.close),
             onPressed: () async {
@@ -157,48 +160,83 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               if (shouldPop) Navigator.pop(context);
             },
           ),
+          centerTitle: true,
+          elevation: 2,
         ),
         body: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: SingleChildScrollView(
-            // để khi nhập dài khỏi bị tràn
             child: Column(
               children: [
-                TextField(
+                _buildTextField(
                   controller: _titleController,
-                  decoration: InputDecoration(labelText: 'Tiêu đề'),
+                  label: 'Tiêu đề',
+                  icon: Icons.title,
+                  maxLines: 1,
                 ),
-                SizedBox(height: 12),
-                TextField(
+                SizedBox(height: 16),
+                _buildTextField(
                   controller: _descController,
-                  decoration: InputDecoration(labelText: 'Mô tả'),
-                  maxLines: 4,
+                  label: 'Mô tả',
+                  icon: Icons.description,
+                  maxLines: 5,
                 ),
-                SizedBox(height: 12),
-                TextField(
+                SizedBox(height: 16),
+                _buildTextField(
                   controller: _imageUrlController,
-                  decoration: InputDecoration(
-                    labelText: 'URL ảnh (nếu có)',
-                    hintText: 'https://example.com/image.jpg',
-                  ),
+                  label: 'URL ảnh (nếu có)',
+                  icon: Icons.image,
                   keyboardType: TextInputType.url,
+                  maxLines: 1,
+                  onChanged: (value) => setState(() {}),
                 ),
+
                 SizedBox(height: 30),
                 _isLoading
                     ? CircularProgressIndicator()
                     : Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        ElevatedButton(
-                          onPressed: _submitRecipe,
-                          child: Text('Đăng bài'),
-                        ),
-                        ElevatedButton(
-                          onPressed: _saveDraft,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey,
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: _submitRecipe,
+                            icon: Icon(Icons.send),
+                            label: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              child: Text(
+                                'Đăng bài',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey[700],
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
                           ),
-                          child: Text('Lưu nháp'),
+                        ),
+                        SizedBox(width: 16),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: _saveDraft,
+                            icon: Icon(Icons.save_alt),
+                            label: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              child: Text(
+                                'Lưu nháp',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.pink[300],
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -207,6 +245,40 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    IconData? icon,
+    TextInputType keyboardType = TextInputType.text,
+    int maxLines = 1,
+    ValueChanged<String>? onChanged,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: icon != null ? Icon(icon) : null,
+        filled: true,
+        fillColor: Colors.grey[100],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: Theme.of(context).primaryColor,
+            width: 2,
+          ),
+        ),
+      ),
+      style: TextStyle(fontSize: 16),
     );
   }
 }

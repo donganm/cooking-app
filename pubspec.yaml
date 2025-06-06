@@ -65,6 +65,7 @@ flutter:
   assets:
     - assets/images/
     - assets/cooking.png
+    - assets/images/group/
   fonts:
     - family: PlaywriteAUSA
       fonts:

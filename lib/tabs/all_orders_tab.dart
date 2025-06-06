@@ -8,7 +8,7 @@ class AllOrdersTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Kho món cộng đồng')),
+      appBar: AppBar(title: Text('Group Recipes')),
       body: StreamBuilder<QuerySnapshot>(
         stream:
             FirebaseFirestore.instance
@@ -39,6 +39,43 @@ class AllOrdersTab extends StatelessWidget {
               final commentsCount = data['commentsCount'] ?? 0;
               final isLiked = likes.contains(currentUserId);
 
+              Widget? imageWidget;
+
+              if (imageUrl.startsWith('assets/')) {
+                imageWidget = ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                  child: Image.asset(
+                    imageUrl,
+                    height: 180,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return SizedBox.shrink(); // ✅ Trả về widget hợp lệ
+                    },
+                  ),
+                );
+              } else if (imageUrl.isNotEmpty) {
+                imageWidget = ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                  child: Image.network(
+                    imageUrl,
+                    height: 180,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        height: 180,
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return SizedBox.shrink(); // ✅ Không trả về null
+                    },
+                  ),
+                );
+              }
+
               return Card(
                 margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 shape: RoundedRectangleBorder(
@@ -48,34 +85,7 @@ class AllOrdersTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (imageUrl.isNotEmpty)
-                      ClipRRect(
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(12),
-                        ),
-                        child: Image.network(
-                          imageUrl,
-                          height: 180,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              height: 180,
-                              child: Center(child: CircularProgressIndicator()),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              height: 180,
-                              color: Colors.grey[200],
-                              child: Center(
-                                child: Icon(Icons.broken_image, size: 50),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
+                    if (imageWidget != null) imageWidget,
                     Padding(
                       padding: const EdgeInsets.all(12),
                       child: Column(
@@ -111,7 +121,6 @@ class AllOrdersTab extends StatelessWidget {
                                       .doc(recipeId);
 
                                   if (isLiked) {
-                                    // Bỏ yêu thích
                                     await recipeRef.update({
                                       'likes': FieldValue.arrayRemove([
                                         currentUserId,
@@ -119,7 +128,6 @@ class AllOrdersTab extends StatelessWidget {
                                     });
                                     await savedRef.delete();
                                   } else {
-                                    // Thêm yêu thích
                                     await recipeRef.update({
                                       'likes': FieldValue.arrayUnion([
                                         currentUserId,
