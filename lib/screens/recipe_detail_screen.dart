@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:btl_flutter_nhom6/screens/list_holder.dart';
 import 'package:btl_flutter_nhom6/widgets/youtube_video.dart';
+import 'list_holder.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
   final String title;
@@ -32,13 +32,21 @@ class RecipeDetailScreen extends StatefulWidget {
   State<RecipeDetailScreen> createState() => _RecipeDetailScreenState();
 }
 
-class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
+class _RecipeDetailScreenState extends State<RecipeDetailScreen> with SingleTickerProviderStateMixin {
   bool isFavorite = false;
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     checkIfFavorite();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> checkIfFavorite() async {
@@ -136,6 +144,7 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                 ),
               ],
             ),
+
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 30),
               child: Row(
@@ -147,53 +156,75 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                 ],
               ),
             ),
+
             if (widget.ytVideo.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: YoutubeVideoPlayer(videoUrl: widget.ytVideo),
               ),
+
             const SizedBox(height: 24),
-            SectionTitle(title: 'Nguyên liệu'),
-            ...List.generate(widget.ingredients.length, (index) {
-              final backgroundColor =
-              index.isEven ? Colors.grey[200] : Colors.white;
-              return Container(
-                color: backgroundColor,
-                width: double.infinity,
-                child: Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: TabBar(
+                controller: _tabController,
+                indicator: UnderlineTabIndicator(
+                  borderSide: BorderSide(width: 3.0, color: Colors.pinkAccent),
+                ),
+                indicatorSize: TabBarIndicatorSize.tab,
+                labelColor: Colors.pinkAccent,
+                unselectedLabelColor: Colors.black,
+                tabs: const [
+                  Tab(child: Text('Nguyên liệu', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'PlaywriteAUSA',))),
+                  Tab(child: Text('Cách làm', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'PlaywriteAUSA',))),
+                ],
+              ),
+            ),
+
+            SizedBox(
+              height: 400,
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  // Ingredients List
+                  ListView.builder(
+                    itemCount: widget.ingredients.length,
+                    itemBuilder: (context, index) {
+                      final bgColor = index.isEven ? Colors.grey[200] : Colors.white;
+                      return Container(
+                        color: bgColor,
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         child: Text(
-                          ' ${widget.ingredients[index]}',
+                          widget.ingredients[index],
                           style: const TextStyle(fontSize: 18),
                         ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
-                ),
-              );
-            }),
-            const SizedBox(height: 24),
-            SectionTitle(title: 'Cách làm'),
-            ...List.generate(stepCount, (index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+
+                  // Instructions List
+                  ListView.builder(
+                    itemCount: stepCount,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: Card(
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: InstructionTile(
+                            step: 'Bước ${index + 1}: ${widget.instructions[index]}',
+                            detail: widget.detail[index],
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  child: InstructionTile(
-                    title: '${index + 1}. ${widget.instructions[index]}',
-                    detail: widget.detail[index],
-                  ),
-                ),
-              );
-            }),
+                ],
+              ),
+            ),
             const SizedBox(height: 32),
           ],
         ),
@@ -220,32 +251,11 @@ class InfoIcon extends StatelessWidget {
   }
 }
 
-class SectionTitle extends StatelessWidget {
-  final String title;
-
-  const SectionTitle({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          color: Colors.pinkAccent,
-        ),
-      ),
-    );
-  }
-}
-
 class InstructionTile extends StatefulWidget {
-  final String title;
+  final String step;
   final String detail;
 
-  const InstructionTile({super.key, required this.title, required this.detail});
+  const InstructionTile({super.key, required this.step, required this.detail});
 
   @override
   State<InstructionTile> createState() => _InstructionTileState();
@@ -256,38 +266,51 @@ class _InstructionTileState extends State<InstructionTile> {
 
   @override
   Widget build(BuildContext context) {
-    return ExpansionTile(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      collapsedShape: RoundedRectangleBorder(
+    return Container(
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
       ),
-      backgroundColor: isExpanded ? Colors.pinkAccent : Colors.white,
-      collapsedBackgroundColor: Colors.white,
-      onExpansionChanged: (expanded) {
-        setState(() {
-          isExpanded = expanded;
-        });
-      },
-      title: Text(
-        widget.title,
-        style: TextStyle(
-          fontSize: 20,
-          color: isExpanded ? Colors.white : Colors.black,
-        ),
-      ),
-      children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-          alignment: Alignment.centerLeft,
-          child: Text(
-            widget.detail,
-            style: TextStyle(
-              color: isExpanded ? Colors.white : Colors.black,
-              fontSize: 18,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            alignment: Alignment.centerLeft,
+            decoration: BoxDecoration(
+              color: Colors.pinkAccent,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
+            ),
+            child: Text(
+              widget.step,
+              style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.white
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
-        ),
-      ],
+          Container(
+            padding: const EdgeInsets.all(16),
+            alignment: Alignment.centerLeft,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(10),
+                bottomRight: Radius.circular(10),
+              ),
+            ),
+            child: Text(
+              widget.detail,
+              style: TextStyle(
+                fontSize: 18,
+              ),
+            ),
+          ),
+        ]
+      ),
     );
   }
 }
