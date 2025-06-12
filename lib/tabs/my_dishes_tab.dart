@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'create_recipe_screen.dart';
+import 'edit_recipe_screen.dart';
+import 'comments_screen.dart';
 
 class MyDishesTab extends StatefulWidget {
   @override
@@ -26,7 +28,7 @@ class _MyDishesTabState extends State<MyDishesTab> {
               TextButton(
                 child: Text('Xóa', style: TextStyle(color: Colors.red)),
                 onPressed: () async {
-                  Navigator.of(context).pop(); // Đóng dialog
+                  Navigator.of(context).pop();
                   await _deleteRecipe(recipeId);
                 },
               ),
@@ -36,26 +38,25 @@ class _MyDishesTabState extends State<MyDishesTab> {
   }
 
   Future<void> _deleteRecipe(String recipeId) async {
-    final myRecipesRef = FirebaseFirestore.instance
-        .collection('my_recipes')
-        .doc(uid)
-        .collection('items')
-        .doc(recipeId);
-
-    final communityRecipesRef = FirebaseFirestore.instance
-        .collection('community_recipes')
-        .doc(recipeId);
-
-    final savedRecipesRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .collection('saved_recipes')
-        .doc(recipeId);
-
     try {
-      await myRecipesRef.delete();
-      await communityRecipesRef.delete();
-      await savedRecipesRef.delete();
+      await FirebaseFirestore.instance
+          .collection('my_recipes')
+          .doc(uid)
+          .collection('items')
+          .doc(recipeId)
+          .delete();
+
+      await FirebaseFirestore.instance
+          .collection('community_recipes')
+          .doc(recipeId)
+          .delete();
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('saved_recipes')
+          .doc(recipeId)
+          .delete();
 
       if (mounted) {
         ScaffoldMessenger.of(
@@ -63,13 +64,30 @@ class _MyDishesTabState extends State<MyDishesTab> {
         ).showSnackBar(SnackBar(content: Text('Xóa bài viết thành công')));
       }
     } catch (e) {
-      print('Lỗi khi xóa bài viết: $e');
+      print('Lỗi khi xóa: $e');
       if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Lỗi khi xóa bài viết')));
       }
     }
+  }
+
+  Future<void> _toggleLike(String recipeId, bool isLiked) async {
+    final recipeRef = FirebaseFirestore.instance
+        .collection('community_recipes')
+        .doc(recipeId);
+    final snapshot = await recipeRef.get();
+    final data = snapshot.data() as Map<String, dynamic>? ?? {};
+    final likes = List<String>.from(data['likes'] ?? []);
+
+    if (isLiked) {
+      likes.remove(uid);
+    } else {
+      likes.add(uid);
+    }
+
+    await recipeRef.update({'likes': likes});
   }
 
   @override
@@ -85,9 +103,8 @@ class _MyDishesTabState extends State<MyDishesTab> {
                 .orderBy('createdAt', descending: true)
                 .snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (!snapshot.hasData)
             return Center(child: CircularProgressIndicator());
-          }
 
           final docs = snapshot.data!.docs;
 
@@ -102,7 +119,8 @@ class _MyDishesTabState extends State<MyDishesTab> {
               final recipeId = docs[index].id;
               final title = myRecipeData['title'] ?? 'Không có tiêu đề';
               final description = myRecipeData['description'] ?? '';
-              final imageAssetPath = myRecipeData['imageUrl'] ?? '';
+              final imageUrl = myRecipeData['imageUrl'] ?? '';
+              final ownerId = myRecipeData['userId'] ?? uid;
 
               return StreamBuilder<DocumentSnapshot>(
                 stream:
@@ -121,10 +139,9 @@ class _MyDishesTabState extends State<MyDishesTab> {
                   final communityData =
                       communitySnapshot.data!.data() as Map<String, dynamic>? ??
                       {};
-
                   final commentsCount = communityData['commentsCount'] ?? 0;
                   final likes = List<String>.from(communityData['likes'] ?? []);
-                  final bool isLikedByUser = likes.contains(uid);
+                  final isLiked = likes.contains(uid);
 
                   return Card(
                     margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -135,13 +152,13 @@ class _MyDishesTabState extends State<MyDishesTab> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (imageAssetPath.isNotEmpty)
+                        if (imageUrl.isNotEmpty)
                           ClipRRect(
                             borderRadius: BorderRadius.vertical(
                               top: Radius.circular(12),
                             ),
                             child: Image.asset(
-                              imageAssetPath,
+                              imageUrl,
                               height: 180,
                               width: double.infinity,
                               fit: BoxFit.cover,
@@ -183,30 +200,77 @@ class _MyDishesTabState extends State<MyDishesTab> {
                                 children: [
                                   Row(
                                     children: [
-                                      Icon(
-                                        Icons.favorite,
-                                        color:
-                                            isLikedByUser
-                                                ? Colors.red
-                                                : Colors.white,
-                                        size: 20,
+                                      GestureDetector(
+                                        onTap:
+                                            () =>
+                                                _toggleLike(recipeId, isLiked),
+                                        child: Icon(
+                                          Icons.favorite,
+                                          color:
+                                              isLiked
+                                                  ? Colors.red
+                                                  : Colors.grey,
+                                          size: 20,
+                                        ),
                                       ),
                                       SizedBox(width: 4),
                                       Text('${likes.length}'),
                                       SizedBox(width: 16),
-                                      Icon(
-                                        Icons.comment,
-                                        color: Colors.grey[600],
-                                        size: 20,
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (_) => CommentsScreen(
+                                                    recipeId: recipeId,
+                                                    recipeOwnerId: ownerId,
+                                                  ),
+                                            ),
+                                          );
+                                        },
+                                        child: Icon(
+                                          Icons.comment,
+                                          color: Colors.grey[600],
+                                          size: 20,
+                                        ),
                                       ),
                                       SizedBox(width: 4),
                                       Text('$commentsCount'),
                                     ],
                                   ),
-                                  IconButton(
-                                    icon: Icon(Icons.delete, color: Colors.red),
-                                    onPressed:
-                                        () => _confirmDelete(context, recipeId),
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.edit,
+                                          color: Colors.blue,
+                                        ),
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (_) => EditRecipeScreen(
+                                                    recipeId: recipeId,
+                                                    initialData: myRecipeData,
+                                                  ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                        ),
+                                        onPressed:
+                                            () => _confirmDelete(
+                                              context,
+                                              recipeId,
+                                            ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),

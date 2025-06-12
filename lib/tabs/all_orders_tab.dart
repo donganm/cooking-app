@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'comments_screen.dart';
 
 class AllOrdersTab extends StatelessWidget {
   final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
@@ -38,6 +39,7 @@ class AllOrdersTab extends StatelessWidget {
               final likes = List<String>.from(data['likes'] ?? []);
               final commentsCount = data['commentsCount'] ?? 0;
               final isLiked = likes.contains(currentUserId);
+              final ownerId = data['userId'] ?? '';
 
               Widget? imageWidget;
 
@@ -152,11 +154,26 @@ class AllOrdersTab extends StatelessWidget {
                               SizedBox(width: 4),
                               Text('${likes.length}'),
                               SizedBox(width: 16),
-                              Icon(
-                                Icons.comment,
-                                color: Colors.grey[600],
-                                size: 20,
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (_) => CommentsScreen(
+                                            recipeId: recipeId,
+                                            recipeOwnerId: ownerId,
+                                          ),
+                                    ),
+                                  );
+                                },
+                                child: Icon(
+                                  Icons.comment,
+                                  color: Colors.grey[600],
+                                  size: 20,
+                                ),
                               ),
+
                               SizedBox(width: 4),
                               Text('$commentsCount'),
                             ],
