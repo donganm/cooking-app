@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '/services/user_auth_service.dart';
 
@@ -78,64 +79,90 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text("Profile"),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text("Chỉnh sửa hồ sơ", style: TextStyle(color: Colors.white)),
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: "Họ tên",
-                border: OutlineInputBorder(),
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _addressController,
-              decoration: const InputDecoration(
-                labelText: "Địa chỉ",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _phoneController,
-              keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(
-                labelText: "Số điện thoại",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _saving ? null : _saveChanges,
-                child: _saving
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
+          ),
+          Center(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(25),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(25),
+                    color: Colors.white.withOpacity(0.15),
+                    border: Border.all(color: Colors.white.withOpacity(0.2)),
+                  ),
+                  child: _loading
+                      ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                      : Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _buildGlassInput(_nameController, "Họ tên"),
+                            const SizedBox(height: 16),
+                            _buildGlassInput(_addressController, "Địa chỉ"),
+                            const SizedBox(height: 16),
+                            _buildGlassInput(_phoneController, "Số điện thoại", keyboard: TextInputType.phone),
+                            const SizedBox(height: 24),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  backgroundColor: Colors.greenAccent.shade400.withOpacity(0.8),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                                ),
+                                onPressed: _saving ? null : _saveChanges,
+                                child: _saving
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                      )
+                                    : const Text("Lưu thay đổi", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                              ),
+                            )
+                          ],
                         ),
-                      )
-                    : const Text("Lưu thay đổi"),
+                ),
               ),
             ),
-          ],
-        ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGlassInput(TextEditingController controller, String label, {TextInputType keyboard = TextInputType.text}) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboard,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white70),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.1),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide.none),
       ),
     );
   }
