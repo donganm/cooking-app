@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
-// Giả sử bạn có màn hình chỉnh sửa nháp (hoặc đăng bài) để chuyển sang chỉnh sửa
-// Nếu không có, bạn có thể sửa lại tùy theo project.
-import 'create_recipe_screen_with_draft.dart'; // hoặc file chỉnh sửa recipe
+import 'create_recipe_screen_with_draft.dart';
 
 class DraftsTab extends StatefulWidget {
   @override
@@ -33,8 +30,6 @@ class _DraftsTabState extends State<DraftsTab> {
   }
 
   void _editDraft(DocumentSnapshot draftDoc) {
-    // Bạn có thể sửa lại màn hình CreateRecipeScreen để nhận dữ liệu nháp và chỉnh sửa.
-    // Ở đây ví dụ truyền dữ liệu nháp sang màn hình chỉnh sửa:
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -43,11 +38,11 @@ class _DraftsTabState extends State<DraftsTab> {
               draftId: draftDoc.id,
               initialTitle: draftDoc['title'],
               initialDescription: draftDoc['description'],
+              initialImageUrl: draftDoc['imageUrl'] ?? '',
             ),
       ),
     ).then((value) {
-      // Refresh lại khi quay về (nếu cần)
-      setState(() {});
+      setState(() {}); // Cập nhật lại khi quay về
     });
   }
 
@@ -82,10 +77,41 @@ class _DraftsTabState extends State<DraftsTab> {
               final draft = docs[index];
               final title = draft['title'] ?? 'Không có tiêu đề';
               final description = draft['description'] ?? '';
+              final imageUrl = draft['imageUrl'] ?? '';
+
+              Widget leadingImage;
+
+              if (imageUrl.startsWith('http')) {
+                leadingImage = Image.network(
+                  imageUrl,
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Icon(Icons.broken_image),
+                );
+              } else if (imageUrl.startsWith('assets/')) {
+                leadingImage = Image.asset(
+                  imageUrl,
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                );
+              } else {
+                leadingImage = Container(
+                  width: 60,
+                  height: 60,
+                  color: Colors.grey[300],
+                  child: Icon(Icons.image),
+                );
+              }
 
               return Card(
                 margin: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 child: ListTile(
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: leadingImage,
+                  ),
                   title: Text(
                     title,
                     maxLines: 1,

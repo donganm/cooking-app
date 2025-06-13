@@ -63,6 +63,8 @@ class _CategoryState extends State<Category> {
                               color: isSelected ? Colors.white : Colors.black,
                               fontWeight: FontWeight.bold,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),

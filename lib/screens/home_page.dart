@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:btl_flutter_nhom6/widgets/recipes_slider.dart';
-import 'package:btl_flutter_nhom6/screens/recipe_detail_screen.dart';
 import 'package:btl_flutter_nhom6/screens/search_screen.dart';
-
 import '../widgets/category.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,14 +12,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
-
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.pinkAccent, // Changed color
+        backgroundColor: Colors.pinkAccent,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -33,10 +29,10 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(width: 15),
                 Text(
-                  "Hello, ${user?.email?.split('@')[0] ?? "Chef"}!",
+                  "Xin chào, ${user?.email?.split('@')[0] ?? "Chef"}!",
                   style: const TextStyle(
-                    fontSize: 22, // Adjusted font size
-                    fontWeight: FontWeight.w600, // Adjusted font weight
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
                 ),
@@ -61,9 +57,9 @@ class _HomePageState extends State<HomePage> {
           children: [
             const SizedBox(height: 26),
             const Text(
-              "What are we cooking \ntoday?",
+              "Hôm nay bạn muốn\nnấu món gì?",
               style: TextStyle(
-                fontSize: 30, // Increased font size
+                fontSize: 30,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'PlaywriteAUSA',
               ),
@@ -71,9 +67,9 @@ class _HomePageState extends State<HomePage> {
             const RecipeSlider(),
             const SizedBox(height: 24),
             const Text(
-              "Categories",
+              "Danh mục",
               style: TextStyle(
-                fontSize: 22, // Increased font size
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'PlaywriteAUSA',
               ),
@@ -90,7 +86,6 @@ class _HomePageState extends State<HomePage> {
 class CategoryIcon extends StatelessWidget {
   final IconData icon;
   final String label;
-
   const CategoryIcon({super.key, required this.icon, required this.label});
 
   @override

@@ -3,14 +3,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class CreateRecipeScreenWithDraft extends StatefulWidget {
-  final String? draftId; // Có thể null nếu tạo mới, không chỉnh sửa nháp
+  final String? draftId;
   final String? initialTitle;
   final String? initialDescription;
+  final String? initialImageUrl;
 
   CreateRecipeScreenWithDraft({
     this.draftId,
     this.initialTitle,
     this.initialDescription,
+    this.initialImageUrl,
   });
 
   @override
@@ -22,6 +24,7 @@ class _CreateRecipeScreenWithDraftState
     extends State<CreateRecipeScreenWithDraft> {
   final _titleController = TextEditingController();
   final _descController = TextEditingController();
+  final _imageUrlController = TextEditingController();
   bool _isLoading = false;
 
   final uid = FirebaseAuth.instance.currentUser!.uid;
@@ -35,11 +38,15 @@ class _CreateRecipeScreenWithDraftState
     if (widget.initialDescription != null) {
       _descController.text = widget.initialDescription!;
     }
+    if (widget.initialImageUrl != null) {
+      _imageUrlController.text = widget.initialImageUrl!;
+    }
   }
 
   Future<void> _submitRecipe() async {
     final title = _titleController.text.trim();
     final description = _descController.text.trim();
+    final imageUrl = _imageUrlController.text.trim();
 
     if (title.isEmpty || description.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -53,7 +60,7 @@ class _CreateRecipeScreenWithDraftState
     final recipeData = {
       'title': title,
       'description': description,
-      'imageUrl': '',
+      'imageUrl': imageUrl,
       'createdBy': uid,
       'createdAt': FieldValue.serverTimestamp(),
       'likes': [],
@@ -61,12 +68,10 @@ class _CreateRecipeScreenWithDraftState
     };
 
     try {
-      // Lưu vào community_recipes
       final communityRef = await FirebaseFirestore.instance
           .collection('community_recipes')
           .add(recipeData);
 
-      // Lưu vào my_recipes/<uid>/items
       await FirebaseFirestore.instance
           .collection('my_recipes')
           .doc(uid)
@@ -74,7 +79,6 @@ class _CreateRecipeScreenWithDraftState
           .doc(communityRef.id)
           .set(recipeData);
 
-      // Nếu bài viết này được tạo từ nháp, xóa nháp đi
       if (widget.draftId != null) {
         await FirebaseFirestore.instance
             .collection('drafts')
@@ -87,8 +91,7 @@ class _CreateRecipeScreenWithDraftState
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Đăng bài thành công')));
-
-      Navigator.pop(context); // Quay lại màn hình trước
+      Navigator.pop(context);
     } catch (e) {
       print('Lỗi đăng bài: $e');
       ScaffoldMessenger.of(
@@ -102,9 +105,9 @@ class _CreateRecipeScreenWithDraftState
   Future<void> _saveDraft() async {
     final title = _titleController.text.trim();
     final description = _descController.text.trim();
+    final imageUrl = _imageUrlController.text.trim();
 
-    if (title.isEmpty && description.isEmpty) {
-      // Không lưu draft nếu cả 2 đều trống
+    if (title.isEmpty && description.isEmpty && imageUrl.isEmpty) {
       return;
     }
 
@@ -113,6 +116,7 @@ class _CreateRecipeScreenWithDraftState
     final draftData = {
       'title': title,
       'description': description,
+      'imageUrl': imageUrl,
       'savedAt': FieldValue.serverTimestamp(),
     };
 
@@ -123,10 +127,8 @@ class _CreateRecipeScreenWithDraftState
           .collection('items');
 
       if (widget.draftId != null) {
-        // Cập nhật draft hiện tại
         await draftsCollection.doc(widget.draftId).set(draftData);
       } else {
-        // Tạo mới draft
         await draftsCollection.add(draftData);
       }
 
@@ -144,10 +146,9 @@ class _CreateRecipeScreenWithDraftState
   }
 
   Future<bool> _onWillPop() async {
-    // Khi bấm nút back (hoặc hủy), hỏi có muốn lưu nháp không
     if (_titleController.text.trim().isEmpty &&
-        _descController.text.trim().isEmpty) {
-      // Nếu cả 2 trống thì không lưu, thoát luôn
+        _descController.text.trim().isEmpty &&
+        _imageUrlController.text.trim().isEmpty) {
       return true;
     }
 
@@ -172,20 +173,22 @@ class _CreateRecipeScreenWithDraftState
 
     if (result == true) {
       await _saveDraft();
-      return true; // thoát sau khi lưu
-    } else {
-      return true; // thoát mà không lưu
     }
+
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
           title: Text(
             widget.draftId == null ? 'Tạo món mới' : 'Chỉnh sửa nháp',
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
           actions: [
             TextButton(
@@ -196,71 +199,112 @@ class _CreateRecipeScreenWithDraftState
               ),
             ),
           ],
+          centerTitle: true,
+          elevation: 2,
         ),
         body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              TextField(
-                controller: _titleController,
-                decoration: InputDecoration(labelText: 'Tiêu đề'),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: _descController,
-                decoration: InputDecoration(labelText: 'Mô tả'),
-                maxLines: 5,
-              ),
-              SizedBox(height: 20),
-              if (_isLoading) CircularProgressIndicator(),
-              if (!_isLoading)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () async {
-                        final wantSave = await showDialog<bool>(
-                          context: context,
-                          builder:
-                              (context) => AlertDialog(
-                                title: Text('Lưu nháp'),
-                                content: Text(
-                                  'Bạn có muốn lưu món này làm nháp không?',
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed:
-                                        () => Navigator.of(context).pop(false),
-                                    child: Text('Không'),
-                                  ),
-                                  TextButton(
-                                    onPressed:
-                                        () => Navigator.of(context).pop(true),
-                                    child: Text('Có'),
-                                  ),
-                                ],
-                              ),
-                        );
-                        if (wantSave == true) {
-                          await _saveDraft();
-                          Navigator.pop(context);
-                        } else {
-                          Navigator.pop(context);
-                        }
-                      },
-                      child: Text('Hủy'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey,
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: _submitRecipe,
-                      child: Text('Đăng bài'),
-                    ),
-                  ],
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                _buildTextField(
+                  controller: _titleController,
+                  label: 'Tiêu đề',
+                  icon: Icons.title,
                 ),
-            ],
+                SizedBox(height: 16),
+                _buildTextField(
+                  controller: _descController,
+                  label: 'Mô tả',
+                  icon: Icons.description,
+                  maxLines: 5,
+                ),
+                SizedBox(height: 16),
+                _buildTextField(
+                  controller: _imageUrlController,
+                  label: 'URL ảnh (nếu có)',
+                  icon: Icons.image,
+                  keyboardType: TextInputType.url,
+                  onChanged: (value) => setState(() {}),
+                ),
+
+                SizedBox(height: 24),
+                if (_isLoading)
+                  CircularProgressIndicator()
+                else
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context); // Không hỏi, thoát luôn
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey[700],
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          child: Text('Hủy', style: TextStyle(fontSize: 16)),
+                        ),
+                      ),
+
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: _submitRecipe,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.pink[300],
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          child: Text(
+                            'Đăng bài',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    IconData? icon,
+    int maxLines = 1,
+    TextInputType keyboardType = TextInputType.text,
+    Function(String)? onChanged,
+  }) {
+    return TextField(
+      controller: controller,
+      maxLines: maxLines,
+      keyboardType: keyboardType,
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        prefixIcon: icon != null ? Icon(icon, color: Colors.grey[700]) : null,
+        labelText: label,
+        filled: true,
+        fillColor: Colors.grey[100],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.blueAccent, width: 2),
         ),
       ),
     );
