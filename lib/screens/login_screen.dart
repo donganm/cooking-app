@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
@@ -66,7 +67,7 @@ class LoginScreen extends StatelessWidget {
                   obscure: true,
                 ),
                 const SizedBox(height: 30),
-
+                
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -86,7 +87,33 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 15),
-
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: themeColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      elevation: 4,
+                    ),
+                    onPressed: () async {
+                      final url = Uri.parse("https://apicookapp.onrender.com/");
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url, mode: LaunchMode.externalApplication);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Không mở được liên kết $url')),
+                        );
+                      }
+                    },
+                    child: const Text(
+                      "Login cho admin",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
