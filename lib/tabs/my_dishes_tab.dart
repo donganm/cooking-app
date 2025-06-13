@@ -235,8 +235,8 @@ class _MyDishesTabState extends State<MyDishesTab> {
                                           size: 20,
                                         ),
                                       ),
-                                      SizedBox(width: 4),
-                                      Text('$commentsCount'),
+                                      // SizedBox(width: 4),
+                                      // Text('$commentsCount'),
                                     ],
                                   ),
                                   Row(

@@ -174,8 +174,8 @@ class AllOrdersTab extends StatelessWidget {
                                 ),
                               ),
 
-                              SizedBox(width: 4),
-                              Text('$commentsCount'),
+                              // SizedBox(width: 4),
+                              // Text('$commentsCount'),
                             ],
                           ),
                         ],
