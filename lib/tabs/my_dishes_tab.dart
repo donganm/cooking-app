@@ -157,7 +157,7 @@ class _MyDishesTabState extends State<MyDishesTab> {
                             borderRadius: BorderRadius.vertical(
                               top: Radius.circular(12),
                             ),
-                            child: Image.network(
+                            child: Image.asset(
                               imageUrl,
                               height: 180,
                               width: double.infinity,
@@ -306,9 +306,7 @@ class _ExpandableTextState extends State<ExpandableText> {
   bool _expanded = false;
   bool _showMoreButton = false;
 
-  final TextStyle _textStyle = TextStyle(
-    fontSize: 15,
-  );
+  final TextStyle _textStyle = TextStyle(fontSize: 15);
 
   @override
   void initState() {

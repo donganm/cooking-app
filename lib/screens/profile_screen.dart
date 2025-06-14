@@ -61,14 +61,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = FirebaseAuth.instance.currentUser;
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("Xóa tài khoản"),
-        content: Text("Bạn có chắc chắn muốn xóa tài khoản email:\n${user?.email}?"),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text("Hủy")),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text("Xóa")),
-        ],
-      ),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text("Xóa tài khoản"),
+            content: Text(
+              "Bạn có chắc chắn muốn xóa tài khoản email:\n${user?.email}?",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text("Hủy"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: const Text("Xóa"),
+              ),
+            ],
+          ),
     );
 
     if (confirm != true) return;
@@ -84,36 +93,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       showDialog(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text("Lỗi"),
-          content: Text(message),
-          actions: [
-            TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text("OK")),
-          ],
-        ),
+        builder:
+            (ctx) => AlertDialog(
+              title: const Text("Lỗi"),
+              content: Text(message),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: const Text("OK"),
+                ),
+              ],
+            ),
       );
     }
   }
 
   void _onPost(BuildContext context) async {
-    await Navigator.push(context, MaterialPageRoute(builder: (_) => const UploadRecipe()));
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const UploadRecipe()),
+    );
   }
 
   void _recipeStatus(BuildContext context) async {
-    await Navigator.push(context, MaterialPageRoute(builder: (_) => const CheckRecipeStatus()));
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const CheckRecipeStatus()),
+    );
   }
 
   void _onLogout(BuildContext context) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("Xác nhận đăng xuất"),
-        content: const Text("Bạn có chắc chắn muốn đăng xuất không?"),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text("Hủy")),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text("Đăng xuất")),
-        ],
-      ),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text("Xác nhận đăng xuất"),
+            content: const Text("Bạn có chắc chắn muốn đăng xuất không?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text("Hủy"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: const Text("Đăng xuất"),
+              ),
+            ],
+          ),
     );
     if (confirm == true) {
       await FirebaseAuth.instance.signOut();
@@ -124,25 +150,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
-    final backgroundGradient = isDarkMode
-        ? const LinearGradient(
-            colors: [Color.fromARGB(255, 5, 6, 6), Color.fromARGB(255, 70, 38, 135), Color.fromARGB(255, 157, 113, 113)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          )
-        : const LinearGradient(
-            colors: [Color.fromARGB(255, 72, 163, 116), Color.fromARGB(255, 153, 98, 156),Color.fromARGB(255, 81, 72, 3)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          );
+    final backgroundGradient =
+        isDarkMode
+            ? const LinearGradient(
+              colors: [
+                Color.fromARGB(255, 5, 6, 6),
+                Color.fromARGB(255, 70, 38, 135),
+                Color.fromARGB(255, 157, 113, 113),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            )
+            : const LinearGradient(
+              colors: [
+                Color.fromARGB(255, 72, 163, 116),
+                Color.fromARGB(255, 153, 98, 156),
+                Color.fromARGB(255, 81, 72, 3),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            );
 
     if (user == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text("Trang profile"), centerTitle: true, backgroundColor: Colors.pink),
+        appBar: AppBar(
+          title: const Text(
+            "Trang profile",
+            style: TextStyle(color: Colors.white),
+          ),
+          centerTitle: true,
+          backgroundColor: Colors.pink,
+        ),
         body: Center(
           child: ElevatedButton(
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => LoginScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => LoginScreen()),
+              );
             },
             child: const Text("Đăng nhập để tiếp tục"),
           ),
@@ -153,7 +198,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.pinkAccent,
-        title: const Text("Trang Profile"),
+        title: const Text(
+          "Trang Profile",
+          style: TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
       ),
       body: Container(
@@ -174,7 +222,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 10),
                     Text(
                       "Tên người dùng: $displayName",
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ],
                 ),
@@ -183,9 +235,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _glassCard(
                 child: Column(
                   children: [
-                    _sectionTitle("Yêu thích", action: "Tất cả", onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const FavoriteScreen()));
-                    }),
+                    _sectionTitle(
+                      "Yêu thích",
+                      action: "Tất cả",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const FavoriteScreen(),
+                          ),
+                        );
+                      },
+                    ),
                     const FavoritedWidget(),
                   ],
                 ),
@@ -196,10 +257,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _sectionTitle("Bảo mật"),
-                    _buildTile(Icons.edit, "Sửa thông tin", () => _onEditProfile(context)),
-                    _buildTile(Icons.lock, "Đổi mật khẩu", () => _onChangedPassword(context)),
-                    _buildTile(Icons.delete_forever, "Xóa tài khoản", () => _onDeleteAccount(context)),
-                    _buildTile(Icons.logout, "Đăng xuất", () => _onLogout(context)),
+                    _buildTile(
+                      Icons.edit,
+                      "Sửa thông tin",
+                      () => _onEditProfile(context),
+                    ),
+                    _buildTile(
+                      Icons.lock,
+                      "Đổi mật khẩu",
+                      () => _onChangedPassword(context),
+                    ),
+                    _buildTile(
+                      Icons.delete_forever,
+                      "Xóa tài khoản",
+                      () => _onDeleteAccount(context),
+                    ),
+                    _buildTile(
+                      Icons.logout,
+                      "Đăng xuất",
+                      () => _onLogout(context),
+                    ),
                   ],
                 ),
               ),
@@ -209,8 +286,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _sectionTitle("Bài đăng"),
-                    _buildTile(Icons.post_add, "Đăng bài mới", () => _onPost(context)),
-                    _buildTile(Icons.visibility, "Trạng thái bài đăng", () => _recipeStatus(context)),
+                    _buildTile(
+                      Icons.post_add,
+                      "Đăng bài mới",
+                      () => _onPost(context),
+                    ),
+                    _buildTile(
+                      Icons.visibility,
+                      "Trạng thái bài đăng",
+                      () => _recipeStatus(context),
+                    ),
                   ],
                 ),
               ),
@@ -221,12 +306,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     _sectionTitle("Admin/Kiểm duyệt viên"),
                     ListTile(
-                      leading: const Icon(Icons.book, color: Color.fromARGB(255, 0, 168, 89)),
-                      title: const Text("Quản lý bài đăng", style: TextStyle(color: Colors.white)),
+                      leading: const Icon(
+                        Icons.book,
+                        color: Color.fromARGB(255, 0, 168, 89),
+                      ),
+                      title: const Text(
+                        "Quản lý bài đăng",
+                        style: TextStyle(color: Colors.white),
+                      ),
                       onTap: () async {
-                        final url = Uri.parse("https://apicookapp.onrender.com");
+                        final url = Uri.parse(
+                          "https://apicookapp.onrender.com",
+                        );
                         if (await canLaunchUrl(url)) {
-                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                          await launchUrl(
+                            url,
+                            mode: LaunchMode.externalApplication,
+                          );
                         }
                       },
                     ),
@@ -241,7 +337,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       isDarkMode = !isDarkMode;
                     });
                   },
-                  child: Text(isDarkMode ? "Chuyển sang Rgb light mode" : "Chuyển sang Pro Mode"),
+                  child: Text(
+                    isDarkMode
+                        ? "Chuyển sang Rgb light mode"
+                        : "Chuyển sang Pro Mode",
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -274,7 +374,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return ListTile(
       leading: Icon(icon, color: const Color.fromARGB(255, 4, 192, 32)),
       title: Text(title, style: const TextStyle(color: Colors.white)),
-      trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
+      trailing: const Icon(
+        Icons.arrow_forward_ios,
+        color: Colors.white,
+        size: 16,
+      ),
       onTap: onTap,
     );
   }
@@ -285,11 +389,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
           if (action != null && onTap != null)
             GestureDetector(
               onTap: onTap,
-              child: Text(action, style: const TextStyle(color: Colors.blue, fontSize: 15)),
+              child: Text(
+                action,
+                style: const TextStyle(color: Colors.blue, fontSize: 15),
+              ),
             ),
         ],
       ),
@@ -317,16 +431,22 @@ class _FavoritedWidgetState extends State<FavoritedWidget> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    final userDoc =
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
     final favorites = List<String>.from(userDoc.data()?['favorites'] ?? []);
 
     if (favorites.isEmpty) return;
 
-    final allRecipesSnapshot = await FirebaseFirestore.instance.collection('recipes').get();
-    final allFavorites = allRecipesSnapshot.docs
-        .where((doc) => favorites.contains(doc['title']))
-        .map((doc) => doc.data())
-        .toList();
+    final allRecipesSnapshot =
+        await FirebaseFirestore.instance.collection('recipes').get();
+    final allFavorites =
+        allRecipesSnapshot.docs
+            .where((doc) => favorites.contains(doc['title']))
+            .map((doc) => doc.data())
+            .toList();
 
     allFavorites.shuffle();
     setState(() {
