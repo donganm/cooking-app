@@ -3,13 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'comments_screen.dart';
 
-class AllOrdersTab extends StatelessWidget {
+class LikedPost extends StatelessWidget {
   final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Mạng xã hội')),
+      appBar: AppBar(title: Text('Bài đã thích')),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: StreamBuilder<QuerySnapshot>(
@@ -19,19 +19,25 @@ class AllOrdersTab extends StatelessWidget {
               .orderBy('createdAt', descending: true)
               .snapshots(),
           builder: (context, snapshot) {
-            if (!snapshot.hasData)
+            if (!snapshot.hasData) {
               return Center(child: CircularProgressIndicator());
+            }
 
-            final docs = snapshot.data!.docs;
+            // Lọc bài viết mà user đã like
+            final likedDocs = snapshot.data!.docs.where((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              final likes = List<String>.from(data['likes'] ?? []);
+              return likes.contains(currentUserId);
+            }).toList();
 
-            if (docs.isEmpty) {
-              return Center(child: Text('Chưa có công thức nào.'));
+            if (likedDocs.isEmpty) {
+              return Center(child: Text('Bạn chưa like công thức nào.'));
             }
 
             return ListView.builder(
-              itemCount: docs.length,
+              itemCount: likedDocs.length,
               itemBuilder: (context, index) {
-                final doc = docs[index];
+                final doc = likedDocs[index];
                 final data = doc.data() as Map<String, dynamic>;
 
                 final recipeId = doc.id;
@@ -229,7 +235,6 @@ class AllOrdersTab extends StatelessWidget {
     );
   }
 }
-
 class ExpandableText extends StatefulWidget {
   final String text;
 

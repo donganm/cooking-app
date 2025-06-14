@@ -29,7 +29,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
     _loadComments();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
-              _scrollController.position.maxScrollExtent - 200 &&
+          _scrollController.position.maxScrollExtent - 200 &&
           !_isLoading) {
         _loadComments();
       }
@@ -65,7 +65,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
   Future<Map<String, String>> _getUserInfo(String userId) async {
     final userDoc =
-        await FirebaseFirestore.instance.collection('users').doc(userId).get();
+    await FirebaseFirestore.instance.collection('users').doc(userId).get();
     final data = userDoc.data() ?? {};
     return {
       'displayName': data['displayName'] ?? 'Người dùng',
@@ -80,11 +80,11 @@ class _CommentsScreenState extends State<CommentsScreen> {
         .doc(widget.recipeId)
         .collection('comments')
         .add({
-          'text': text,
-          'userId': currentUser.uid,
-          'createdAt': FieldValue.serverTimestamp(),
-          if (parentId != null) 'parentId': parentId,
-        });
+      'text': text,
+      'userId': currentUser.uid,
+      'createdAt': FieldValue.serverTimestamp(),
+      if (parentId != null) 'parentId': parentId,
+    });
     _commentController.clear();
     setState(() {
       _comments.clear();
@@ -111,21 +111,20 @@ class _CommentsScreenState extends State<CommentsScreen> {
     final controller = TextEditingController(text: currentText);
     final newText = await showDialog<String>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text('Sửa bình luận'),
-            content: TextField(controller: controller, maxLines: 4),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('Hủy'),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context, controller.text),
-                child: Text('Lưu'),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: Text('Sửa bình luận'),
+        content: TextField(controller: controller, maxLines: 4),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Hủy'),
           ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, controller.text),
+            child: Text('Lưu'),
+          ),
+        ],
+      ),
     );
 
     if (newText != null &&
@@ -136,11 +135,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
           .doc(widget.recipeId)
           .collection('comments')
           .doc(commentId)
-          .update({'text': newText});
-
-      setState(() {
-        final index = _comments.indexWhere((doc) => doc.id == commentId);
-        if (index != -1) _comments[index] = _comments[index];
+          .update({
+        'text': newText,
+        'editedAt': FieldValue.serverTimestamp(),
       });
     }
   }
@@ -148,13 +145,17 @@ class _CommentsScreenState extends State<CommentsScreen> {
   @override
   Widget build(BuildContext context) {
     final parentComments =
-        _comments.where((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          return data['parentId'] == null;
-        }).toList();
+    _comments.where((doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      return data['parentId'] == null;
+    }).toList();
 
     return Scaffold(
-      appBar: AppBar(title: Text('Bình luận')),
+      appBar: AppBar(
+        title: Text('Bình luận'),
+        backgroundColor: Colors.pinkAccent,
+        foregroundColor: Colors.white,
+      ),
       body: Column(
         children: [
           Expanded(
@@ -173,21 +174,22 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
                 final doc = parentComments[index];
                 final data = doc.data() as Map<String, dynamic>;
-                final text = data['text'] ?? '';
+                final comment = data['text'] ?? '';
                 final userId = data['userId'] ?? '';
                 final createdAt = (data['createdAt'] as Timestamp?)?.toDate();
                 final isMine = userId == currentUser.uid;
                 final timeString =
-                    createdAt != null ? timeago.format(createdAt) : '';
+                createdAt != null ? timeago.format(createdAt) : '';
 
-                return FutureBuilder<Map<String, String>>(
-                  future: _getUserInfo(userId),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) return SizedBox();
-                    final user = snapshot.data!;
-                    final name = user['displayName']!;
-                    final avatarUrl = user['photoUrl']!;
-
+                return FutureBuilder<DocumentSnapshot>(
+                  future: FirebaseFirestore.instance.collection('users').doc(data['userId']).get(),
+                  builder: (context, userSnapshot) {
+                    if (userSnapshot.connectionState == ConnectionState.waiting) {
+                      return SizedBox();
+                    }
+                    final userData = userSnapshot.data?.data() as Map<String, dynamic>?;
+                    final userEmail = userData?['email'] ?? 'Không rõ email';
+                    final userName = userData?['fullname'] ?? 'Chef';
                     return Card(
                       margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       child: Column(
@@ -195,54 +197,58 @@ class _CommentsScreenState extends State<CommentsScreen> {
                         children: [
                           ListTile(
                             leading: CircleAvatar(
-                              backgroundImage:
-                                  avatarUrl.isNotEmpty
-                                      ? NetworkImage(avatarUrl)
-                                      : null,
-                              child:
-                                  avatarUrl.isEmpty ? Icon(Icons.person) : null,
+                              radius: 21,
+                              backgroundImage: NetworkImage(
+                                "https://hoseiki.vn/wp-content/uploads/2025/03/avatar-mac-dinh-5.jpg",
+                              ),
                             ),
-                            title: Text(text),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            title: Text(
+                              '  $userName',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text(
+                                '$userEmail',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontStyle: FontStyle.italic,
+                                )
+                            ),
+                            trailing: Text(
+                              timeString,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  name,
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(height: 2),
-                                Text(
-                                  timeString,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey,
+                                Text(comment, style: TextStyle(fontSize: 20)),
+                                if (isMine)
+                                  PopupMenuButton<String>(
+                                    onSelected: (value) {
+                                      if (value == 'edit') {
+                                        _editComment(doc.id, comment);
+                                      } else if (value == 'delete') {
+                                        _deleteComment(doc.id);
+                                      }
+                                    },
+                                    itemBuilder: (context) => [
+                                      PopupMenuItem(
+                                        value: 'edit',
+                                        child: Text('Sửa'),
+                                      ),
+                                      PopupMenuItem(
+                                        value: 'delete',
+                                        child: Text('Xóa'),
+                                      ),
+                                    ],
                                   ),
-                                ),
                               ],
                             ),
-                            trailing:
-                                isMine
-                                    ? PopupMenuButton<String>(
-                                      onSelected: (value) {
-                                        if (value == 'edit') {
-                                          _editComment(doc.id, text);
-                                        } else if (value == 'delete') {
-                                          _deleteComment(doc.id);
-                                        }
-                                      },
-                                      itemBuilder:
-                                          (context) => [
-                                            PopupMenuItem(
-                                              value: 'edit',
-                                              child: Text('Sửa'),
-                                            ),
-                                            PopupMenuItem(
-                                              value: 'delete',
-                                              child: Text('Xóa'),
-                                            ),
-                                          ],
-                                    )
-                                    : null,
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(
@@ -255,10 +261,10 @@ class _CommentsScreenState extends State<CommentsScreen> {
                                   isScrollControlled: true,
                                   builder: (_) {
                                     final replyController =
-                                        TextEditingController();
+                                    TextEditingController();
                                     return Padding(
                                       padding:
-                                          MediaQuery.of(context).viewInsets,
+                                      MediaQuery.of(context).viewInsets,
                                       child: Container(
                                         padding: EdgeInsets.all(12),
                                         child: Column(
@@ -268,7 +274,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                                               controller: replyController,
                                               decoration: InputDecoration(
                                                 hintText:
-                                                    'Trả lời bình luận...',
+                                                'Trả lời bình luận...',
                                               ),
                                             ),
                                             Align(
@@ -296,106 +302,93 @@ class _CommentsScreenState extends State<CommentsScreen> {
                           ),
                           ..._comments
                               .where((replyDoc) {
-                                final replyData =
-                                    replyDoc.data() as Map<String, dynamic>;
-                                return replyData['parentId'] == doc.id;
-                              })
+                            final replyData =
+                            replyDoc.data() as Map<String, dynamic>;
+                            return replyData['parentId'] == doc.id;
+                          })
                               .map((replyDoc) {
-                                final replyData =
-                                    replyDoc.data() as Map<String, dynamic>;
-                                final replyText = replyData['text'] ?? '';
-                                final replyUserId = replyData['userId'] ?? '';
-                                final replyCreatedAt =
-                                    (replyData['createdAt'] as Timestamp?)
-                                        ?.toDate();
-                                final isReplyMine =
-                                    replyUserId == currentUser.uid;
-                                final replyTime =
-                                    replyCreatedAt != null
-                                        ? timeago.format(replyCreatedAt)
-                                        : '';
-
-                                return FutureBuilder<Map<String, String>>(
-                                  future: _getUserInfo(replyUserId),
-                                  builder: (context, snapshot) {
-                                    if (!snapshot.hasData) return SizedBox();
-                                    final replyUser = snapshot.data!;
-                                    return Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 40,
-                                        right: 8,
-                                        top: 4,
-                                        bottom: 4,
+                            final replyData =
+                            replyDoc.data() as Map<String, dynamic>;
+                            final replyText = replyData['text'] ?? '';
+                            final replyUserId = replyData['userId'] ?? '';
+                            final replyCreatedAt =
+                            (replyData['createdAt'] as Timestamp?)
+                              ?.toDate();
+                            final isReplyMine =
+                              replyUserId == currentUser.uid;
+                            final replyTime =
+                            replyCreatedAt != null
+                              ? timeago.format(replyCreatedAt)
+                              : '';
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                left: 20,
+                                right: 8,
+                                bottom: 8,
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  ListTile(
+                                    leading: CircleAvatar(
+                                      radius: 21,
+                                      backgroundImage: NetworkImage(
+                                        "https://hoseiki.vn/wp-content/uploads/2025/03/avatar-mac-dinh-5.jpg",
                                       ),
-                                      child: ListTile(
-                                        leading: CircleAvatar(
-                                          backgroundImage:
-                                              replyUser['photoUrl']!.isNotEmpty
-                                                  ? NetworkImage(
-                                                    replyUser['photoUrl']!,
-                                                  )
-                                                  : null,
-                                          child:
-                                              replyUser['photoUrl']!.isEmpty
-                                                  ? Icon(Icons.person)
-                                                  : null,
-                                        ),
-                                        title: Text(replyText),
-                                        subtitle: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              replyUser['displayName']!,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            SizedBox(height: 2),
-                                            Text(
-                                              replyTime,
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        trailing:
-                                            isReplyMine
-                                                ? PopupMenuButton<String>(
-                                                  onSelected: (value) {
-                                                    if (value == 'edit') {
-                                                      _editComment(
-                                                        replyDoc.id,
-                                                        replyText,
-                                                      );
-                                                    } else if (value ==
-                                                        'delete') {
-                                                      _deleteComment(
-                                                        replyDoc.id,
-                                                      );
-                                                    }
-                                                  },
-                                                  itemBuilder:
-                                                      (context) => [
-                                                        PopupMenuItem(
-                                                          value: 'edit',
-                                                          child: Text('Sửa'),
-                                                        ),
-                                                        PopupMenuItem(
-                                                          value: 'delete',
-                                                          child: Text('Xóa'),
-                                                        ),
-                                                      ],
-                                                )
-                                                : null,
+                                    ),
+                                    title: Text(
+                                    '  $userName',
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                    subtitle: Text(
+                                      '$userEmail',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontStyle: FontStyle.italic,
+                                      )
+                                    ),
+                                    trailing: Text(
+                                      replyTime,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
                                       ),
-                                    );
-                                  },
-                                );
-                              })
-                              .toList(),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(replyText, style: TextStyle(fontSize: 20)),
+                                        if (isReplyMine)
+                                          PopupMenuButton<String>(
+                                            onSelected: (value) {
+                                              if (value == 'edit') {
+                                                _editComment(doc.id, comment);
+                                              } else if (value == 'delete') {
+                                                _deleteComment(doc.id);
+                                              }
+                                            },
+                                            itemBuilder: (context) => [
+                                              PopupMenuItem(
+                                                value: 'edit',
+                                                child: Text('Sửa'),
+                                              ),
+                                              PopupMenuItem(
+                                                value: 'delete',
+                                                child: Text('Xóa'),
+                                              ),
+                                            ],
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              )
+                            );
+                          },
+                          ).toList(),
                         ],
                       ),
                     );

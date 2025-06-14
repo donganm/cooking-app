@@ -157,7 +157,7 @@ class _MyDishesTabState extends State<MyDishesTab> {
                             borderRadius: BorderRadius.vertical(
                               top: Radius.circular(12),
                             ),
-                            child: Image.asset(
+                            child: Image.network(
                               imageUrl,
                               height: 180,
                               width: double.infinity,
@@ -186,13 +186,7 @@ class _MyDishesTabState extends State<MyDishesTab> {
                                 ),
                               ),
                               SizedBox(height: 6),
-                              Text(
-                                description,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[700],
-                                ),
-                              ),
+                              ExpandableText(text: description),
                               SizedBox(height: 10),
                               Row(
                                 mainAxisAlignment:
@@ -295,6 +289,76 @@ class _MyDishesTabState extends State<MyDishesTab> {
         },
         child: Icon(Icons.add),
       ),
+    );
+  }
+}
+
+class ExpandableText extends StatefulWidget {
+  final String text;
+
+  const ExpandableText({required this.text});
+
+  @override
+  _ExpandableTextState createState() => _ExpandableTextState();
+}
+
+class _ExpandableTextState extends State<ExpandableText> {
+  bool _expanded = false;
+  bool _showMoreButton = false;
+
+  final TextStyle _textStyle = TextStyle(
+    fontSize: 15,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkTextOverflow());
+  }
+
+  void _checkTextOverflow() {
+    final textSpan = TextSpan(text: widget.text, style: _textStyle);
+    final tp = TextPainter(
+      text: textSpan,
+      maxLines: 2,
+      textDirection: TextDirection.ltr,
+    );
+    tp.layout(maxWidth: context.size!.width);
+
+    if (tp.didExceedMaxLines) {
+      setState(() => _showMoreButton = true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final maxLines = _expanded ? null : 2;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.text,
+          style: _textStyle,
+          maxLines: maxLines,
+          overflow: _expanded ? TextOverflow.visible : TextOverflow.ellipsis,
+        ),
+        if (_showMoreButton)
+          GestureDetector(
+            onTap: () => setState(() => _expanded = !_expanded),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                _expanded ? 'Thu gọn ▲' : 'Xem thêm ▼',
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
